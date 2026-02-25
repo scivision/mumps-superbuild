@@ -294,6 +294,4 @@ install(FILES ${_mi}mumps_c_types.h ${_mi}mumps_compat.h TYPE INCLUDE)
 
 install(TARGETS MUMPS EXPORT ${PROJECT_NAME}-targets)
 
-# this must NOT be an ALIAS or linking in other packages breaks.
-add_library(MUMPS::MUMPS INTERFACE IMPORTED GLOBAL)
-target_link_libraries(MUMPS::MUMPS INTERFACE MUMPS)
+add_library(MUMPS::MUMPS ALIAS MUMPS)
