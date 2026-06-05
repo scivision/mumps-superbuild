@@ -34,7 +34,7 @@ jobs:
       matrix:
         mpich: [false]
         lapack_vendor: [""]
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         include:
           - lapack_vendor: "OpenBLAS"
             os: ubuntu-latest
@@ -66,6 +66,35 @@ jobs:
 
     - name: build example
       uses: ./.github/workflows/composite-example
+
+
+  macos:
+    timeout-minutes: 15
+
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        comp: [ { cc: "gcc-15", fc: "gfortran-15" },
+                { cc: "clang", fc: "gfortran-15" },
+                { cc: "clang", fc: "flang" }
+        ]
+
+    steps:
+    - *checkout
+    - *prereqs
+
+    - if: matrix.comp.fc == 'gfortran-15'
+      run: echo "FC=gfortran-15" >> $GITHUB_ENV
+
+    - if: matrix.comp.fc == 'flang'
+      run: |
+        brew install flang
+        echo "FC=flang" >> $GITHUB_ENV
+
+    - name: build and test
+      shell: bash
+      run: cmake --workflow default
 
 
   gnu-make:
