@@ -159,7 +159,10 @@ if(MUMPS_gpu)
 
 # https://cmake.org/cmake/help/latest/module/FindCUDAToolkit.html
   if(MUMPS_xkblas)
-    string(JSON xkblas_url GET "${json}" "xkblas")
+    # Check if 'xkblas_url' hasn't been defined by the user (with -D)
+    if(NOT DEFINED xkblas_url)
+      string(JSON xkblas_url GET "${json}" "xkblas")
+    endif()
 
     # FIXME: in the future as users contribute, we could adapt to NVHPC, etc.
     set(KAAPI_USE_CUDA_RT true)
@@ -260,10 +263,13 @@ if(MUMPS_metis OR MUMPS_parmetis)
     set(_metis_components)
   endif()
 
-  if(MUMPS_parmetis)
-    string(JSON metis_url GET "${json}" "parmetis")
-  else()
-    string(JSON metis_url GET "${json}" "metis")
+  # Check if 'metis_url' hasn't been defined by the user (with -D)
+  if(NOT DEFINED metis_url)
+    if(MUMPS_parmetis)
+      string(JSON metis_url GET "${json}" "parmetis")
+    else()
+      string(JSON metis_url GET "${json}" "metis")
+    endif()
   endif()
 
   FetchContent_Declare(mumps_metis

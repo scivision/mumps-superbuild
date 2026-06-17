@@ -35,7 +35,10 @@ endif()
 set(SCALAPACK_BUILD_TESTING off)
 set(SCALAPACK_BUILD_TESTS off)
 
-string(JSON scalapack_url GET "${json}" "scalapack")
+# Check if 'scalapack_url' hasn't been defined by the user (with -D)
+if(NOT DEFINED scalapack_url)
+  string(JSON scalapack_url GET "${json}" "scalapack")
+endif()
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM")
   # oneAPI must use MKL, it will fail to build Netlib SCALAPACK

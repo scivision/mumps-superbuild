@@ -64,7 +64,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE true)
 
 if(WIN32 AND (NOT BISON_ROOT OR NOT FLEX_ROOT))
 
-  string(JSON win_flex_bison_url GET "${json}" win_flex_bison url)
+  # Check if 'win_flex_bison_url' hasn't been defined by the user (with -D)
+  if(NOT DEFINED win_flex_bison_url)
+    string(JSON win_flex_bison_url GET "${json}" win_flex_bison url)
+  endif()
 
   FetchContent_Declare(win_flex_bison URL ${win_flex_bison_url})
   FetchContent_MakeAvailable(win_flex_bison)
@@ -92,7 +95,10 @@ if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
   set(CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_MINIMUM_REQUIRED_VERSION})
 endif()
 
-string(JSON scotch_url GET "${json}" "scotch")
+# Check if 'scotch_url' hasn't been defined by the user (with -D)
+if(NOT DEFINED scotch_url)
+  string(JSON scotch_url GET "${json}" "scotch")
+endif()
 
 message(STATUS "BISON_ROOT ${BISON_ROOT}  FLEX_ROOT ${FLEX_ROOT}")
 
