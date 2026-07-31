@@ -4,6 +4,8 @@ option(MUMPS_find_static "Find static libraries for Lapack and Scalapack (defaul
 
 option(MUMPS_gemmt "GEMMT is recommended in MUMPS User Manual if available" ON)
 
+option(MUMPS_avx512 "AVX512 VBMI instruction set accelerates adaptive precision with BLR" OFF)
+
 option(MUMPS_parallel "parallel (use MPI)" ON)
 option(MUMPS_scalapack "Use ScalaPACK to speed up the solution of linear systems" ON)
 

@@ -13,6 +13,7 @@ add_feature_info(GPU MUMPS_gpu "MUMPS CUDA GPU support (see User Manual section 
 add_feature_info(xKBLAS MUMPS_xkblas "xKBLAS GPU-accelerated BLAS")
 
 add_feature_info(Openmp MUMPS_openmp "OpenMP API https://www.openmp.org/")
+add_feature_info(AVX512 MUMPS_avx512 "AVX-512 instruction set accelerates adaptive precision with BLR (starting with mumps 5.9.0)")
 
 add_feature_info(real32 BUILD_SINGLE "Build with single precision")
 add_feature_info(real64 BUILD_DOUBLE "Build with double precision")

@@ -98,6 +98,18 @@ Default is OpenMP OFF.
 cmake -DMUMPS_openmp=on
 ```
 
+## AVX512
+
+MUMPS can take profit from avx512 vbmi (Vector Byte Manipulation Instructions) instruction set to speed-up compression and decompression when using BLR with adaptive precision.
+This option `MUMPS_avx512vbmi=true` will activate this feature (if your compiler handles it). There is no execution test, so you can enable
+it on a machine that doesn't handle this instruction set (but you wont be able to run this build of mumps locally).
+Default is avx512 vbmi OFF.
+
+```sh
+cmake -DMUMPS_avx512vbmi=on
+```
+
+
 ---
 
 [Matlab](./Readme_matlab.md) can use MUMPS library as well.
