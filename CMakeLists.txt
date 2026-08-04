@@ -269,12 +269,23 @@ if(MUMPS_metis OR MUMPS_parmetis)
     endif()
   endif()
 
-  FetchContent_Declare(mumps_metis
-  URL ${metis_url}
-  FIND_PACKAGE_ARGS ${_metis_components}
-  )
+  # FetchContent derives the find_package() name from the content name, so the FIND_PACKAGE_ARGS
+  # below looks for a package called "mumps_metis" and cmake/FindMETIS.cmake is never reached.
+  # The content cannot simply be renamed to METIS: scivision/parmetis declares its own METIS
+  # content and the first declaration wins, which would leave ParMETIS without a real METIS.
+  # Look METIS up explicitly instead, opt-in so that building it stays the default.
+  if(MUMPS_find_metis OR DEFINED METIS_ROOT OR DEFINED ENV{METIS_ROOT})
+    find_package(METIS ${_metis_components})
+  endif()
 
-  FetchContent_MakeAvailable(mumps_metis)
+  if(NOT METIS_FOUND)
+    FetchContent_Declare(mumps_metis
+    URL ${metis_url}
+    FIND_PACKAGE_ARGS ${_metis_components}
+    )
+
+    FetchContent_MakeAvailable(mumps_metis)
+  endif()
 
   list(APPEND ORDERING_DEFS REALTYPEWIDTH=32 IDXTYPEWIDTH=${IDXTYPEWIDTH} metis)
 

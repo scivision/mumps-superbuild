@@ -35,14 +35,17 @@ cmake -DMUMPS_metis=yes
 cmake -DMUMPS_parmetis=yes
 ```
 
-optionally, try to find METIS or ParMETIS before building if needed:
+METIS is built by default. Optionally, try to find an installed METIS or ParMETIS first,
+falling back to building it if none is found:
 
 ```sh
-cmake -DMUMPS_metis=yes
+cmake -DMUMPS_metis=yes -DMUMPS_find_metis=yes
+```
 
-# or
+Specifying its location implies the search:
 
-cmake -DMUMPS_parmetis=yes
+```sh
+cmake -DMUMPS_metis=yes -DMETIS_ROOT=/path/to/metis
 ```
 
 Build MUMPS
