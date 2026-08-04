@@ -320,6 +320,23 @@ ${mumps_upstream_SOURCE_DIR}/src/CMakeLists.txt
 COPYONLY)
 add_subdirectory(${mumps_upstream_SOURCE_DIR}/src src)
 
+# Several MUMPS Fortran/C sources call pthread APIs directly (e.g. for
+# I/O locking / OpenMP-adjacent synchronization), but none of the MUMPS
+# targets explicitly link Threads::Threads, only relying on it being
+# pulled in transitively by whichever BLAS/LAPACK/SCALAPACK/MPI backend
+# happens to depend on pthread. Some backends (e.g. a shared OpenBLAS, or
+# certain MPI implementations) don't expose that dependency transitively,
+# leaving these symbols unresolved at link time on those configurations.
+# Link Threads::Threads directly on the MUMPS targets so the pthread
+# symbols they use are always resolved regardless of backend.
+if(Threads_FOUND)
+  foreach(tgt IN ITEMS MUMPS::COMMON MUMPS::SMUMPS MUMPS::DMUMPS MUMPS::CMUMPS MUMPS::ZMUMPS MUMPS::PORD)
+    if(TARGET ${tgt})
+      target_link_libraries(${tgt} INTERFACE Threads::Threads)
+    endif()
+  endforeach()
+endif()
+
 if(MUMPS_matlab)
   configure_file(cmake/matlab.cmake
   ${mumps_upstream_SOURCE_DIR}/MATLAB/CMakeLists.txt
