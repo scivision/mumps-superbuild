@@ -86,3 +86,25 @@ Optionally, run self-tests:
 ```sh
 ctest --test-dir build
 ```
+
+## Visual Studio generator
+
+Ninja is the smoother path and is what the presets use. If Visual Studio project files are
+wanted, select the Fortran toolset and let CMake pick MSVC `cl` for C:
+
+```sh
+cmake -B build -G "Visual Studio 17 2022" -A x64 -T fortran=ifx
+
+cmake --build build --config Release
+```
+
+Three things differ from the Ninja generator:
+
+* MSBuild does not preprocess `*.F` / `*.F90`, whereas CMake preprocesses them itself for the
+  Ninja Fortran module dependency scanner. `cmake/compilers.cmake` adds `/fpp` for this
+  generator; without it the build fails with misleading errors #5082, #6333, #6417 and #5508.
+* Targets built only from `$<TARGET_OBJECTS:>` are linked by link.exe rather than ifx, and
+  MSBuild's `LIB` does not cover the Intel Fortran runtime. `cmake/compilers.cmake` adds the
+  oneAPI compiler `lib` directory to the linker search path.
+* ALL_BUILD is a `.vcxproj` and cannot depend on a Fortran `.vfproj`, so a Fortran target that
+  no other target links is never built. Give such targets `LINKER_LANGUAGE C`.
