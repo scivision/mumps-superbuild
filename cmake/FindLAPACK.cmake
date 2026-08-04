@@ -280,7 +280,11 @@ function(lapack_aocl)
 
 set(_names flame)
 if(WIN32)
-  if(BUILD_SHARED_LIBS)
+  # Use MUMPS_find_static (the project's own static/shared search toggle)
+  # rather than BUILD_SHARED_LIBS: whether MUMPS builds
+  # shared libraries is unrelated to whether AOCL's Flame library should be
+  # searched for as a static or shared/dll library.
+  if(NOT MUMPS_find_static)
     list(APPEND _names AOCL-LibFlame-Win-MT-dll AOCL-LibFlame-Win-dll)
   else()
     list(APPEND _names AOCL-LibFlame-Win-MT AOCL-LibFlame-Win)
@@ -319,7 +323,9 @@ endif()
 
 set(_names blis-mt blis)
 if(WIN32)
-  if(BUILD_SHARED_LIBS)
+  # Same rationale as above: use MUMPS_find_static, not BUILD_SHARED_LIBS,
+  # to pick the AOCL Blis (BLAS) library naming variant to search for.
+  if(NOT MUMPS_find_static)
     list(APPEND _names AOCL-LibBlis-Win-MT-dll AOCL-LibBlis-Win-dll)
   else()
     list(APPEND _names AOCL-LibBlis-Win-MT AOCL-LibBlis-Win)

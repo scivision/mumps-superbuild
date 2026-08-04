@@ -219,7 +219,11 @@ endfunction()
 
 function(scalapack_netlib)
 
-if(BUILD_SHARED_LIBS)
+# Use MUMPS_find_static (the project's own static/shared search toggle)
+# rather than BUILD_SHARED_LIBS: whether MUMPS builds
+# shared libraries is unrelated to whether SCALAPACK itself should be
+# searched for as a static or shared library.
+if(NOT MUMPS_find_static)
   set(_s shared)
 else()
   set(_s static)
