@@ -7,8 +7,14 @@ set(mumps_cflags)
 set(mumps_fflags -w)
 # lets project consuming MUMPS not have excessive warnings from MUMPS sources
 
-list(APPEND mumps_cdefs "$<$<COMPILE_LANGUAGE:C>:Add_>")
-# "Add_" works for all modern compilers we tried.
+# "Add_" (trailing underscore) is the Fortran name-mangling convention used
+# by GNU/Intel Fortran on Linux, but not on Windows, where the convention is
+# "UPPER" (uppercase, no underscore). Unconditionally defining "Add_" broke
+# name mangling between the C and Fortran sources on Windows. Select the
+# convention based on platform instead of assuming "Add_" universally.
+list(APPEND mumps_cdefs "$<$<AND:$<COMPILE_LANGUAGE:C>,$<BOOL:${UNIX}>>:Add_>")
+list(APPEND mumps_cdefs "$<$<AND:$<COMPILE_LANGUAGE:C>,$<BOOL:${WIN32}>>:UPPER>")
+
 
 if(MSVC)
   list(APPEND mumps_cdefs _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE)
