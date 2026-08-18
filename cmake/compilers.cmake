@@ -7,8 +7,13 @@ set(mumps_cflags)
 set(mumps_fflags -w)
 # lets project consuming MUMPS not have excessive warnings from MUMPS sources
 
-list(APPEND mumps_cdefs "$<$<COMPILE_LANGUAGE:C>:Add_>")
-# "Add_" works for all modern compilers we tried.
+if(MSVC)
+  # https://www.intel.com/content/www/us/en/docs/fortran-compiler/developer-guide-reference/2026-1/names-001.html
+  # include/mumps_compat.h has logic that corresponds to our logic for MUMPS_WIN32
+  list(APPEND mumps_cdefs $<$<COMPILE_LANGUAGE:C>:UPPER>)
+else()
+  list(APPEND mumps_cdefs $<$<COMPILE_LANGUAGE:C>:Add_>)
+endif()
 
 if(MSVC)
   list(APPEND mumps_cdefs _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE)
