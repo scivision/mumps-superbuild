@@ -113,7 +113,7 @@ foreach(_prec IN ITEMS c z)
 
   check_source_compiles(Fortran
     "program test
-    use, intrinsic :: iso_fortran_env, only : ${_rk} => rk
+    use, intrinsic :: iso_fortran_env, only : rk => ${_rk}
     implicit none
     external :: p${_prec}gemm
     integer :: desca(9), descb(9), descc(9)

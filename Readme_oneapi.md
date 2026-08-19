@@ -46,6 +46,8 @@ cmake --build build
 If Visual Studio generator is desired:
 
 ```sh
+cmake -Bbuild -G "Visual Studio 18 2026" -T fortran=ifx
+# or
 cmake -Bbuild -G "Visual Studio 17 2022" -T fortran=ifx
 ```
 
