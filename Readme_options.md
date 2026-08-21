@@ -43,16 +43,16 @@ HOWEVER, this requires all libraries INCLUDING MPI to be compiled with 64-bit in
 Otherwise, the program will crash at runtime with MPI errors.
 For example, oneAPI / oneMPI work, but default system installs of OpenMPI / MPICH will generally fail--the user will need to specially compile an MPI library with 64-bit integers.
 
-## ScalaPACK
+## ScaLAPACK
 
-ScalaPACK is only used for `MUMPS_parallel=on`.
-ScalaPACK can be omitted with MUMPS &ge; 5.7.0 by option:
+ScaLAPACK is only used for `MUMPS_parallel=on`.
+ScaLAPACK can be omitted with MUMPS &ge; 5.7.0 by option:
 
 ```sh
 cmake -DMUMPS_scalapack=off
 ```
 
-To control whether to first look for Scalapack and only if needed automatically build ScalaPACK,
+To control whether to first look for Scalapack and only if needed automatically build ScaLAPACK,
 Optionally, specify the location of Scalapack with CMake option `-DSCALAPACK_ROOT=/path/to/scalapack"
 
 ```sh
@@ -100,15 +100,27 @@ cmake -DMUMPS_openmp=on
 
 ## AVX512
 
-MUMPS can take profit from avx512 vbmi (Vector Byte Manipulation Instructions) instruction set to speed-up compression and decompression when using BLR with adaptive precision.
-This option `MUMPS_avx512vbmi=true` will activate this feature (if your compiler handles it). There is no execution test, so you can enable
-it on a machine that doesn't handle this instruction set (but you wont be able to run this build of mumps locally).
-Default is avx512 vbmi OFF.
+MUMPS 5.9.0 and newer can take profit from AVX-512-VBMI
+[Vector Byte Manipulation Instructions](https://www.singlestore.com/blog/a-programmers-perspective/)
+instruction set to speed-up compression and decompression when using BLR with adaptive precision.
+The CMake configure option `DMUMPS_avx512vbmi=true` will activate this feature if the compiler and CPU are capable.
+The CMake configuration will fail if the compiler or CPU doesn't support the requested AVX-512-VBMI instruction set.
 
 ```sh
 cmake -DMUMPS_avx512vbmi=on
 ```
 
+Compilers known to work with MUMPS AVX-512-VBMI with Intel AVX-512-VBMI capable CPUs include:
+
+* [GCC &ge; 5](https://gcc.gnu.org/gcc-5/changes.html#x86)
+* Clang
+* Intel oneAPI
+* NVIDIA HPC SDK (NVHPC)
+
+The "Ice Lake" (2019) and later Intel workstations and server CPUs generally support AVX-512-VBMI.
+Mobile (laptop) CPUs may not support the AVX-512-VBMI features, one has to try it to see if it works.
+It is reported that some AMD CPUs support AVX-512-VBMI, but we have not tested this yet with MUMPS or the AMD AOCL compiler.
+ARM CPUs at the time of writing don't support AVX-512 in general.
 
 ---
 
