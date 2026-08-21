@@ -86,3 +86,23 @@ Optionally, run self-tests:
 ```sh
 ctest --test-dir build
 ```
+
+## Shared library
+
+`BUILD_SHARED_LIBS=on` builds one DLL per library, which does not link with the Windows oneAPI
+compilers. ifx emits Fortran module variables as COMMON symbols:
+`CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS` cannot export those, and Fortran cannot import them without
+an explicit `DLLIMPORT` attribute in the MUMPS sources. `dmumps` then fails to resolve the
+`MUMPS_BUF_COMMON` and `MUMPS_LR_COMMON` module data that lives in `mumps_common`.
+
+Build the component libraries static and bundle every object into a single `mumps.dll` instead:
+
+```sh
+cmake -B build -DBUILD_SHARED_LIBS=off -DMUMPS_dll=on
+
+cmake --build build
+```
+
+Those references then stay inside the DLL. Only the C API -- `smumps_c`, `dmumps_c`,
+`cmumps_c`, `zmumps_c` -- and the Fortran entry points are exported; PORD, METIS and the module
+data remain internal. Link against `mumps.lib` as usual.

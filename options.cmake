@@ -42,6 +42,12 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build shared libraries")
 
+option(MUMPS_dll "Bundle every MUMPS object into a single shared library -- the way to get a DLL on Windows, see cmake/dll.cmake")
+if(MUMPS_dll AND BUILD_SHARED_LIBS)
+  message(FATAL_ERROR "MUMPS_dll bundles the component libraries into one shared library, so they must be static:
+  cmake -DMUMPS_dll=on -DBUILD_SHARED_LIBS=off")
+endif()
+
 # fPIC flags are specified by MUMPS INSTALL file, so we do the same in CMake
 include(CheckPIESupported)
 check_pie_supported()

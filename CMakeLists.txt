@@ -320,6 +320,10 @@ ${mumps_upstream_SOURCE_DIR}/src/CMakeLists.txt
 COPYONLY)
 add_subdirectory(${mumps_upstream_SOURCE_DIR}/src src)
 
+if(MUMPS_dll)
+  include(cmake/dll.cmake)
+endif()
+
 if(MUMPS_matlab)
   configure_file(cmake/matlab.cmake
   ${mumps_upstream_SOURCE_DIR}/MATLAB/CMakeLists.txt
