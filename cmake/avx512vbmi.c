@@ -7,10 +7,8 @@
 
 #include <immintrin.h>
 
-#ifdef _MSC_VER
-#  include <intrin.h>
-#elif defined(__GNUC__) || defined(__clang__)
-#  include <cpuid.h>
+#if defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
+#include <intrin.h>
 #endif
 
 #ifndef __AVX512F__
@@ -36,7 +34,7 @@ int main(void) {
 
 #ifdef __AVX512VBMI__
    ret = 0;
-#elif defined(_MSC_VER) || !defined(__INTEL_LLVM_COMPILER)
+#elif defined(_MSC_VER) && !defined(__INTEL_LLVM_COMPILER)
 // it seems only MSVC Visual Studio has no way to define __AVX512VBMI__ macro,
 // but it can be detected by cpuid instruction
 

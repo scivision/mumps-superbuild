@@ -159,7 +159,8 @@ endif()
 
 set(MKL_SYCL_MPI false)
 set(MKL_SYCL_LINK false)
-# for Intel oneAPI 2025.2, we don't need SYCL
+set(ENABLE_SYCL_COMPILER false)
+# for Intel oneAPI 2025.2+, we don't want SYCL
 
 # default: dynamic
 if(STATIC IN_LIST SCALAPACK_FIND_COMPONENTS)
