@@ -34,7 +34,7 @@ COMPONENTS
   https://www.amd.com/en/developer/aocl/scalapack.html
 
 ``STATIC``
-  Library search default on non-Windows is shared then static. On Windows default search is static only.
+  Library search default on non-Windows is shared then static. On Windows default search is static first.
   Specifying STATIC component searches for static libraries only.
 
 Result Variables
@@ -188,14 +188,23 @@ if(DEFINED SCALAPACK_ROOT)
   set(_nodef_scalapack NO_DEFAULT_PATH)
 endif()
 
-set(_s "LP64")
+set(_ps "LP64")
 if(INT64 IN_LIST SCALAPACK_FIND_COMPONENTS)
-  string(PREPEND _s "I")
+  string(PREPEND _ps "I")
+endif()
+
+if(WIN32)
+  set(_path_suffix lib/${_ps}/static)
+  if(NOT STATIC IN_LIST SCALAPACK_FIND_COMPONENTS)
+    list(APPEND _path_suffix lib/${_ps}/shared)
+  endif()
+else()
+  set(_path_suffix lib/${_ps})
 endif()
 
 find_library(SCALAPACK_LIBRARY
 NAMES scalapack
-PATH_SUFFIXES lib/${_s}
+PATH_SUFFIXES ${_path_suffix}
 HINTS ${SCALAPACK_ROOT} $ENV{SCALAPACK_ROOT}
 ${_nodef_scalapack}
 DOC "AOCL SCALAPACK library"
@@ -212,20 +221,13 @@ endfunction()
 
 function(scalapack_netlib)
 
-if(BUILD_SHARED_LIBS)
-  set(_s shared)
-else()
-  set(_s static)
-endif()
-list(APPEND _s openmpi/lib mpich/lib)
-
 # Names to search for:
 # scalapack-{openmpi,mpich}: Ubuntu and similar
 # "scalapack":               RHEL-like distros, Netlib, etc.
 find_library(SCALAPACK_LIBRARY
 NAMES scalapack scalapack-openmpi scalapack-mpich
 NAMES_PER_DIR
-PATH_SUFFIXES ${_s}
+PATH_SUFFIXES openmpi/lib mpich/lib
 DOC "SCALAPACK library"
 VALIDATOR scalapack_check
 )
