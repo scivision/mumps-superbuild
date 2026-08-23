@@ -244,7 +244,7 @@ if(MUMPS_ACTUAL_VERSION VERSION_GREATER_EQUAL 5.9.0 AND MUMPS_avx512)
     list(APPEND mumps_cdefs USE_AVX512_VBMI)
     add_compile_options("$<$<COMPILE_LANGUAGE:C>:${MUMPS_AVX512VBMI_CFLAGS}>")
   else()
-    message(FATAL_ERROR "MUMPS compiler does not support the requested AVX-512F/VBMI/BW/VL epi8 intrinsics.")
+    message(WARNING "MUMPS_avx512=on, but AVX512 VBMI instruction set not detected on this system. Please check compiler and CPU support.")
   endif()
 endif()
 

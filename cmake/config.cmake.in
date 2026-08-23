@@ -74,6 +74,8 @@ set(MUMPS_xkblas @MUMPS_xkblas@)
 
 set(MUMPS_HAVE_GEMMT @BLAS_HAVE_GEMMT@)
 
+set(MUMPS_HAVE_AVX512VBMI @MUMPS_HAVE_AVX512VBMI@)
+
 set(MUMPS_parmetis @MUMPS_parmetis@)
 if(MUMPS_parmetis)
   find_dependency(METIS COMPONENTS ParMETIS)

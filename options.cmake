@@ -2,7 +2,11 @@ option(MUMPS_BUILD_TESTING "Build tests" ${MUMPS_IS_TOP_LEVEL})
 
 option(MUMPS_find_static "Find static libraries for Lapack and Scalapack (default shared then static search)")
 
-option(MUMPS_gemmt "GEMMT is recommended in MUMPS User Manual if available" ON)
+if(NOT DEFINED MUMPS_USE_MKL AND (DEFINED ENV{MKLROOT} AND IS_DIRECTORY "$ENV{MKLROOT}"))
+  set(MUMPS_USE_MKL true)
+endif()
+
+option(MUMPS_gemmt "Use GEMMT BLAS extension for matrix-matrix multiplication (see User Manual section 5.26)" ${MUMPS_USE_MKL})
 
 option(MUMPS_avx512 "AVX512 VBMI instruction set accelerates adaptive precision with BLR" OFF)
 
