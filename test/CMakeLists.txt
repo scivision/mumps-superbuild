@@ -83,7 +83,12 @@ set_property(TEST ${test_names} PROPERTY RESOURCE_LOCK cpu_mpi)
 if(BUILD_SHARED_LIBS)
   if(WIN32)
     set_property(TEST ${test_names} PROPERTY
-    ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${CMAKE_INSTALL_FULL_BINDIR};PATH=path_list_prepend:${CMAKE_PREFIX_PATH}/bin;PATH=path_list_prepend:${PROJECT_BINARY_DIR}"
+    ENVIRONMENT_MODIFICATION
+      "PATH=path_list_prepend:$<TARGET_FILE_DIR:mumps_common>"
+      "PATH=path_list_prepend:$<TARGET_FILE_DIR:pord>"
+      "PATH=path_list_prepend:$<TARGET_FILE_DIR:mpiseq_fortran>"
+      "PATH=path_list_prepend:${CMAKE_INSTALL_FULL_BINDIR}"
+      "PATH=path_list_prepend:${CMAKE_PREFIX_PATH}/bin"
     )
   elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set_property(TEST ${test_names} PROPERTY

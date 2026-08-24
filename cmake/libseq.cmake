@@ -24,6 +24,9 @@ target_link_libraries(mpiseq_fortran INTERFACE mpiseq_c)
 # libmpiseq file
 add_library(mpiseq $<TARGET_OBJECTS:mpiseq_c> $<TARGET_OBJECTS:mpiseq_fortran>)
 target_link_libraries(mpiseq PUBLIC mpiseq_fortran mpiseq_c)
+target_link_options(mpiseq PRIVATE
+	"$<$<BOOL:${MSVC}>:/LIBPATH:${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}>"
+)
 
 set_target_properties(mpiseq PROPERTIES
 EXPORT_NAME MPISEQ

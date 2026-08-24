@@ -120,6 +120,9 @@ if("MPI_TO_K_OMP" IN_LIST mumps_common_Fortran_defs OR
 endif()
 
 add_library(mumps_common $<TARGET_OBJECTS:mumps_common_Fortran> $<TARGET_OBJECTS:mumps_common_C>)
+target_link_options(mumps_common PRIVATE
+  "$<$<BOOL:${MSVC}>:/LIBPATH:${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}>"
+)
 
 # use MPI_Fortran_INCLUDE_DIRS directly to avoid MPICH Fortran -fallow flag leakage
 
@@ -228,6 +231,19 @@ target_compile_options(${a}mumps_Fortran PRIVATE ${mumps_fflags})
 
 add_library(${a}mumps $<TARGET_OBJECTS:${a}mumps_C> $<TARGET_OBJECTS:${a}mumps_Fortran>)
 
+if(WIN32 AND BUILD_SHARED_LIBS)
+  # Automatic DLL exports cannot make Fortran module data consumable without
+  # dllimport annotations, so keep common data in the same DLL as its users.
+  target_sources(${a}mumps PRIVATE
+    $<TARGET_OBJECTS:mumps_common_Fortran>
+    $<TARGET_OBJECTS:mumps_common_C>
+  )
+endif()
+
+target_link_options(${a}mumps PRIVATE
+  "$<$<BOOL:${MSVC}>:/LIBPATH:${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}>"
+)
+
 foreach(t IN ITEMS ${a}mumps ${a}mumps_C ${a}mumps_Fortran)
 
   target_include_directories(${t} PUBLIC
@@ -269,7 +285,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../include/mumps_int_def.h
 TYPE INCLUDE
 )
 
-endfunction(precision_source)
+endfunction()
 
 if(BUILD_SINGLE)
   precision_source("s")

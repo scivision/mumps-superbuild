@@ -80,6 +80,3 @@ if(MUMPS_intsize64)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
-
-# Necessary for shared library with Visual Studio / Windows oneAPI
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS true)

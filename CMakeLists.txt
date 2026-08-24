@@ -91,11 +91,6 @@ enable_testing()
 include(GNUInstallDirs)
 
 # --- Checks and workarounds
-if(MSVC AND BUILD_SHARED_LIBS)
-  message(WARNING "MUMPS: Windows IntelLLVM compilers with **shared** libraries is not supported and will probably fail.
-  Recommend using static libraries, which does work:
-  cmake -DBUILD_SHARED_LIBS=off")
-endif()
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
   if(CMAKE_GENERATOR MATCHES "Ninja")
@@ -126,6 +121,10 @@ endif()
 
 # --- user options
 include(options.cmake)
+
+if(WIN32 AND BUILD_SHARED_LIBS)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
 # --- RPATH handling for transitive dependencies
 if(MUMPS_ENABLE_RPATH AND NOT WIN32)
