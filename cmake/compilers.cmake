@@ -86,4 +86,29 @@ if(MUMPS_intsize64)
   endif()
 endif()
 
+if(WIN32 AND CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM" AND CMAKE_GENERATOR MATCHES "Visual Studio")
+  # MSBuild does not run the preprocessor on *.F / *.F90. The Ninja generator does not need this,
+  # as CMake preprocesses Fortran itself there to scan module dependencies. Without /fpp the
+  # #if / #else in the MUMPS sources are compiled as ordinary source lines, and the build fails
+  # with misleading errors: #5082, #6333, #6417, #5508.
+  string(APPEND CMAKE_Fortran_FLAGS " /fpp")
+
+  # mumps_common, mpiseq and the arithmetic libraries have no sources of their own, only
+  # $<TARGET_OBJECTS:>, so CMake links them with link.exe rather than ifx. Under MSBuild the LIB
+  # environment variable only covers the Visual Studio toolset, so the Intel Fortran runtime
+  # (ifconsol.lib, ifmodintr.lib, ...) is not found. A Ninja build started from an oneAPI command
+  # prompt already has that directory in LIB.
+  # Keep forward slashes: the Visual Studio generator turns /LIBPATH: into
+  # <AdditionalLibraryDirectories> and drops backslashes on the way.
+  cmake_path(GET CMAKE_Fortran_COMPILER PARENT_PATH _ifx_dir)
+  cmake_path(GET _ifx_dir PARENT_PATH _ifx_root)
+  if(IS_DIRECTORY "${_ifx_root}/lib")
+    foreach(t IN ITEMS EXE SHARED MODULE)
+      string(APPEND CMAKE_${t}_LINKER_FLAGS " \"/LIBPATH:${_ifx_root}/lib\"")
+    endforeach()
+  else()
+    message(WARNING "MUMPS: Intel Fortran runtime libraries not found under ${_ifx_root}/lib, linking may fail")
+  endif()
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
