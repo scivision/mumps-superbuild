@@ -34,7 +34,7 @@ then add the Ninja filepath to Windows environment variable `CMAKE_PROGRAM_PATH`
 Alternatively, tell CMake the full path to Ninja like:
 
 ```sh
-cmake -G Ninja -B build -DCMAKE_MAKE_PROGRAM=C:/path/to/ninja.exe
+cmake -G Ninja -B build -DCMAKE_MAKE_PROGRAM=path/to/ninja.exe
 ```
 
 ## Compiler

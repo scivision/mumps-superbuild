@@ -6,7 +6,7 @@
 #
 #   cmake -B build -DFETCHCONTENT_SOURCE_DIR_MUMPS_UPSTREAM=/path/to/cache
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.25)
 
 include(FetchContent)
 

@@ -4,7 +4,13 @@ option(MUMPS_find_static "Find static libraries for Lapack and Scalapack (defaul
 
 option(MUMPS_find_metis "Try to find METIS / ParMETIS before building it. Implied by -DMETIS_ROOT=")
 
-option(MUMPS_gemmt "GEMMT is recommended in MUMPS User Manual if available" ON)
+if(NOT DEFINED MUMPS_USE_MKL AND (DEFINED ENV{MKLROOT} AND IS_DIRECTORY "$ENV{MKLROOT}"))
+  set(MUMPS_USE_MKL true)
+endif()
+
+option(MUMPS_gemmt "Use GEMMT BLAS extension for matrix-matrix multiplication (see User Manual section 5.26)" ${MUMPS_USE_MKL})
+
+option(MUMPS_avx512 "AVX512 VBMI instruction set accelerates adaptive precision with BLR" OFF)
 
 option(MUMPS_parallel "parallel (use MPI)" ON)
 option(MUMPS_scalapack "Use ScalaPACK to speed up the solution of linear systems" ON)

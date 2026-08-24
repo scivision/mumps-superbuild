@@ -91,11 +91,6 @@ enable_testing()
 include(GNUInstallDirs)
 
 # --- Checks and workarounds
-if(MSVC AND BUILD_SHARED_LIBS)
-  message(WARNING "MUMPS: Windows IntelLLVM compilers with **shared** libraries is not supported and will probably fail.
-  Recommend using static libraries, which does work:
-  cmake -DBUILD_SHARED_LIBS=off")
-endif()
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
   if(CMAKE_GENERATOR MATCHES "Ninja")
@@ -126,6 +121,10 @@ endif()
 
 # --- user options
 include(options.cmake)
+
+if(WIN32 AND BUILD_SHARED_LIBS)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
 # --- RPATH handling for transitive dependencies
 if(MUMPS_ENABLE_RPATH AND NOT WIN32)
@@ -236,6 +235,18 @@ if(MUMPS_gemmt)
   endif()
 endif()
 
+# AVX512 VBMI instruction set accelerates adaptive precision with BLR (starting with mumps 5.9.0)
+if(MUMPS_ACTUAL_VERSION VERSION_GREATER_EQUAL 5.9.0 AND MUMPS_avx512)
+  include(cmake/avx512vbmi.cmake)
+  if(MUMPS_HAVE_AVX512VBMI)
+    list(APPEND mumps_fdefs USE_AVX512_VBMI)
+    list(APPEND mumps_cdefs USE_AVX512_VBMI)
+    add_compile_options("$<$<COMPILE_LANGUAGE:C>:${MUMPS_AVX512VBMI_CFLAGS}>")
+  else()
+    message(WARNING "MUMPS_avx512=on, but AVX512 VBMI instruction set not detected on this system. Please check compiler and CPU support.")
+  endif()
+endif()
+
 # --- ordering libs
 
 set(ORDERING_DEFS pord)
@@ -318,6 +329,23 @@ configure_file(cmake/mumps.cmake
 ${mumps_upstream_SOURCE_DIR}/src/CMakeLists.txt
 COPYONLY)
 add_subdirectory(${mumps_upstream_SOURCE_DIR}/src src)
+
+# Several MUMPS Fortran/C sources call pthread APIs directly (e.g. for
+# I/O locking / OpenMP-adjacent synchronization), but none of the MUMPS
+# targets explicitly link Threads::Threads, only relying on it being
+# pulled in transitively by whichever BLAS/LAPACK/SCALAPACK/MPI backend
+# happens to depend on pthread. Some backends (e.g. a shared OpenBLAS, or
+# certain MPI implementations) don't expose that dependency transitively,
+# leaving these symbols unresolved at link time on those configurations.
+# Link Threads::Threads directly on the MUMPS targets so the pthread
+# symbols they use are always resolved regardless of backend.
+if(Threads_FOUND)
+  foreach(tgt IN ITEMS MUMPS::COMMON MUMPS::SMUMPS MUMPS::DMUMPS MUMPS::CMUMPS MUMPS::ZMUMPS MUMPS::PORD)
+    if(TARGET ${tgt})
+      target_link_libraries(${tgt} INTERFACE Threads::Threads)
+    endif()
+  endforeach()
+endif()
 
 if(MUMPS_matlab)
   configure_file(cmake/matlab.cmake

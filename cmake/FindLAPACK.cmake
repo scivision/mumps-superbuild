@@ -52,7 +52,7 @@ COMPONENTS
   get Lapack95 interfaces for MKL or Netlib (must also specify one of MKL, Netlib)
 
 ``STATIC``
-  Library search default on non-Windows is shared then static. On Windows default search is static only.
+  Library search default on non-Windows is shared then static. On Windows default search is static first.
   Specifying STATIC component searches for static libraries only.
 
 
@@ -79,6 +79,9 @@ References
 #]=======================================================================]
 
 include(CheckSourceCompiles)
+
+set(LAPACK_LIBRARIES)
+set(LAPACK_INCLUDE_DIRS)
 
 # ===== functions ==========
 
@@ -213,8 +216,8 @@ if(LAPACKE IN_LIST LAPACK_FIND_COMPONENTS)
 
   if(LAPACKE_LIBRARY AND LAPACKE_INCLUDE_DIR)
     set(LAPACK_LAPACKE_FOUND true PARENT_SCOPE)
-    list(APPEND LAPACK_INCLUDE_DIR ${LAPACKE_INCLUDE_DIR})
-    list(APPEND LAPACK_LIBRARY ${LAPACKE_LIBRARY})
+    list(APPEND LAPACK_INCLUDE_DIRS ${LAPACKE_INCLUDE_DIR})
+    list(APPEND LAPACK_LIBRARIES ${LAPACKE_LIBRARY})
   endif()
 
   mark_as_advanced(LAPACKE_LIBRARY LAPACKE_INCLUDE_DIR)
@@ -237,13 +240,13 @@ HINTS ${_lapack_root} ${BLAS_ROOT} $ENV{BLAS_ROOT}
 VALIDATOR lapack_check
 )
 
-if(NOT BLAS_LIBRARY)
-  return()
+list(APPEND LAPACK_LIBRARIES ${LAPACK_LIBRARY} ${BLAS_LIBRARY})
+
+if(LAPACK_LIBRARY AND BLAS_LIBRARY)
+  set(LAPACK_Netlib_FOUND true PARENT_SCOPE)
 endif()
 
-list(APPEND LAPACK_LIBRARY ${BLAS_LIBRARY})
-set(LAPACK_Netlib_FOUND true PARENT_SCOPE)
-return(PROPAGATE LAPACK_LIBRARY)
+return(PROPAGATE LAPACK_LIBRARIES LAPACK_INCLUDE_DIRS)
 
 endfunction()
 
@@ -266,24 +269,31 @@ HINTS ${_openblas_root}
 DOC "OpenBLAS include directory"
 )
 
-if(NOT LAPACK_LIBRARY)
-  return()
+if(LAPACK_LIBRARY AND LAPACK_INCLUDE_DIR)
+  set(LAPACK_OpenBLAS_FOUND true PARENT_SCOPE)
 endif()
 
-set(LAPACK_OpenBLAS_FOUND true PARENT_SCOPE)
-set(LAPACK_LIBRARY ${LAPACK_LIBRARY} PARENT_SCOPE)
+set(LAPACK_LIBRARIES ${LAPACK_LIBRARY})
+set(LAPACK_INCLUDE_DIRS ${LAPACK_INCLUDE_DIR})
+
+return(PROPAGATE LAPACK_LIBRARIES LAPACK_INCLUDE_DIRS)
 
 endfunction()
 
 
 function(lapack_aocl)
 
+set(_nodef_lapack)
+if(DEFINED LAPACK_ROOT)
+  set(_nodef_lapack NO_DEFAULT_PATH)
+endif()
+
 set(_names flame)
 if(WIN32)
-  if(BUILD_SHARED_LIBS)
+  list(APPEND _names AOCL-LibFlame-Win-MT AOCL-LibFlame-Win)
+
+  if(NOT STATIC IN_LIST LAPACK_FIND_COMPONENTS)
     list(APPEND _names AOCL-LibFlame-Win-MT-dll AOCL-LibFlame-Win-dll)
-  else()
-    list(APPEND _names AOCL-LibFlame-Win-MT AOCL-LibFlame-Win)
   endif()
 endif()
 
@@ -296,7 +306,9 @@ find_library(LAPACK_LIBRARY
 NAMES ${_names}
 NAMES_PER_DIR
 PATH_SUFFIXES lib/${_s}
+HINTS ${LAPACK_ROOT} $ENV{LAPACK_ROOT}
 DOC "AOCL Flame library"
+${_nodef_lapack}
 )
 
 cmake_path(GET LAPACK_LIBRARY PARENT_PATH _lapack_root)
@@ -309,24 +321,19 @@ NAMES FLAME.h
 PATH_SUFFIXES include/${_s}
 HINTS ${_lapack_root}
 DOC "AOCL Flame header"
+${_nodef_lapack}
 )
-
-if(NOT LAPACK_LIBRARY OR NOT LAPACK_INCLUDE_DIR)
-  return()
-endif()
 
 # --- BLIS
 
 set(_names blis-mt blis)
 if(WIN32)
-  if(BUILD_SHARED_LIBS)
+  list(APPEND _names AOCL-LibBlis-Win-MT AOCL-LibBlis-Win)
+
+  if(NOT STATIC IN_LIST LAPACK_FIND_COMPONENTS)
     list(APPEND _names AOCL-LibBlis-Win-MT-dll AOCL-LibBlis-Win-dll)
-  else()
-    list(APPEND _names AOCL-LibBlis-Win-MT AOCL-LibBlis-Win)
   endif()
 endif()
-
-message(STATUS "_lapack_root: ${_lapack_root} _aocl_root: ${_aocl_root}")
 
 find_library(BLAS_LIBRARY
 NAMES ${_names}
@@ -335,6 +342,7 @@ PATH_SUFFIXES lib/${_s}
 HINTS ${_aocl_root}/amd-blis ${BLAS_ROOT} $ENV{BLAS_ROOT}
 VALIDATOR lapack_check
 DOC "AOCL Blis library"
+${_nodef_lapack}
 )
 
 find_path(BLAS_INCLUDE_DIR
@@ -342,12 +350,8 @@ NAMES blis.h
 PATH_SUFFIXES include/${_s}
 HINTS ${_aocl_root}/amd-blis ${BLAS_ROOT} $ENV{BLAS_ROOT}
 DOC "Blis header"
+${_nodef_lapack}
 )
-
-if(NOT BLAS_LIBRARY OR NOT BLAS_INCLUDE_DIR)
-  return()
-endif()
-
 
 if(LAPACKE IN_LIST LAPACK_FIND_COMPONENTS)
 
@@ -356,6 +360,7 @@ if(LAPACKE IN_LIST LAPACK_FIND_COMPONENTS)
   PATH_SUFFIXES lib/${_s}
   HINTS ${_lapack_root} ${_aocl_root}/amd-libflame
   DOC "AOCL LAPACKE library"
+  ${_nodef_lapack}
   )
 
   # lapack/include for Homebrew
@@ -364,21 +369,26 @@ if(LAPACKE IN_LIST LAPACK_FIND_COMPONENTS)
   PATH_SUFFIXES include/${_s}
   HINTS ${_lapack_root} ${_aocl_root}/amd-libflame
   DOC "AOCL LAPACKE include directory"
+  ${_nodef_lapack}
   )
 
   if(LAPACKE_LIBRARY AND LAPACKE_INCLUDE_DIR)
     set(LAPACK_LAPACKE_FOUND true PARENT_SCOPE)
-    list(APPEND LAPACK_INCLUDE_DIR ${LAPACKE_INCLUDE_DIR})
-    list(APPEND LAPACK_LIBRARY ${LAPACKE_LIBRARY})
+    list(APPEND LAPACK_INCLUDE_DIRS ${LAPACKE_INCLUDE_DIR})
+    list(APPEND LAPACK_LIBRARIES ${LAPACKE_LIBRARY})
   endif()
 
   mark_as_advanced(LAPACKE_LIBRARY LAPACKE_INCLUDE_DIR)
 endif()
 
+if(LAPACK_LIBRARY AND LAPACK_INCLUDE_DIR AND BLAS_LIBRARY AND BLAS_INCLUDE_DIR)
+  set(LAPACK_AOCL_FOUND true PARENT_SCOPE)
+endif()
 
-set(LAPACK_AOCL_FOUND true PARENT_SCOPE)
-set(LAPACK_LIBRARY ${LAPACK_LIBRARY} ${BLAS_LIBRARY} PARENT_SCOPE)
-set(LAPACK_INCLUDE_DIR ${LAPACK_INCLUDE_DIR} ${BLAS_INCLUDE_DIR} PARENT_SCOPE)
+list(APPEND LAPACK_LIBRARIES ${LAPACK_LIBRARY} ${BLAS_LIBRARY})
+list(APPEND LAPACK_INCLUDE_DIRS ${LAPACK_INCLUDE_DIR} ${BLAS_INCLUDE_DIR})
+
+return(PROPAGATE LAPACK_LIBRARIES LAPACK_INCLUDE_DIRS)
 
 endfunction()
 
@@ -416,22 +426,22 @@ endif()
 
 find_package(MKL CONFIG)
 
-if(NOT MKL_FOUND)
-  return()
+if(MKL_FOUND)
+  set(LAPACK_COMPILE_OPTIONS $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
+  set(LAPACK_INCLUDE_DIR $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
+  set(LAPACK_LIBRARY $<LINK_ONLY:MKL::MKL>)
+  set(LAPACK_MKL_FOUND true)
+
+  foreach(c IN ITEMS TBB LAPACK95 INT64 OpenMP)
+    if(${c} IN_LIST LAPACK_FIND_COMPONENTS)
+      set(LAPACK_${c}_FOUND true)
+    endif()
+  endforeach()
+
+  set(LAPACK_LIBRARIES ${LAPACK_LIBRARY})
+  set(LAPACK_INCLUDE_DIRS ${LAPACK_INCLUDE_DIR})
+
 endif()
-
-set(LAPACK_COMPILE_OPTIONS $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
-set(LAPACK_INCLUDE_DIR $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
-set(LAPACK_LIBRARY $<LINK_ONLY:MKL::MKL>)
-
-
-set(LAPACK_MKL_FOUND true)
-
-foreach(c IN ITEMS TBB LAPACK95 INT64 OpenMP)
-  if(${c} IN_LIST LAPACK_FIND_COMPONENTS)
-    set(LAPACK_${c}_FOUND true)
-  endif()
-endforeach()
 
 endmacro()
 
@@ -439,18 +449,6 @@ endmacro()
 
 if(NOT DEFINED LAPACK_CRAY AND DEFINED ENV{CRAYPE_VERSION})
   set(LAPACK_CRAY true)
-endif()
-
-if(NOT (LAPACK_CRAY
-  OR OpenBLAS IN_LIST LAPACK_FIND_COMPONENTS
-  OR Netlib IN_LIST LAPACK_FIND_COMPONENTS
-  OR MKL IN_LIST LAPACK_FIND_COMPONENTS
-  OR AOCL IN_LIST LAPACK_FIND_COMPONENTS))
-  if(DEFINED ENV{MKLROOT} AND IS_DIRECTORY "$ENV{MKLROOT}")
-    list(APPEND LAPACK_FIND_COMPONENTS MKL)
-  else()
-    list(APPEND LAPACK_FIND_COMPONENTS Netlib)
-  endif()
 endif()
 
 if(STATIC IN_LIST LAPACK_FIND_COMPONENTS)
@@ -468,6 +466,10 @@ elseif(AOCL IN_LIST LAPACK_FIND_COMPONENTS)
   lapack_aocl()
 elseif(LAPACK_CRAY)
   # LAPACK is implicitly part of Cray PE LibSci, use Cray compiler wrapper.
+elseif(DEFINED ENV{MKLROOT} AND IS_DIRECTORY "$ENV{MKLROOT}")
+  lapack_mkl()
+else()
+  lapack_netlib()
 endif()
 
 if(STATIC IN_LIST LAPACK_FIND_COMPONENTS)
@@ -485,14 +487,11 @@ if(LAPACK_CRAY)
   set(LAPACK_links true)
   find_package_handle_standard_args(LAPACK REQUIRED_VARS LAPACK_links)
 else()
-  find_package_handle_standard_args(LAPACK HANDLE_COMPONENTS REQUIRED_VARS LAPACK_LIBRARY)
+  find_package_handle_standard_args(LAPACK HANDLE_COMPONENTS REQUIRED_VARS LAPACK_LIBRARIES)
 endif()
 
 if(LAPACK_FOUND)
 # need if _FOUND guard as can't overwrite imported target even if bad
-
-set(LAPACK_LIBRARIES ${LAPACK_LIBRARY})
-set(LAPACK_INCLUDE_DIRS ${LAPACK_INCLUDE_DIR})
 
 message(VERBOSE "Lapack libraries: ${LAPACK_LIBRARIES}
 Lapack include directories: ${LAPACK_INCLUDE_DIRS}")
@@ -500,8 +499,8 @@ Lapack include directories: ${LAPACK_INCLUDE_DIRS}")
 if(NOT TARGET LAPACK::LAPACK)
   add_library(LAPACK::LAPACK INTERFACE IMPORTED)
   set_property(TARGET LAPACK::LAPACK PROPERTY INTERFACE_COMPILE_OPTIONS "${LAPACK_COMPILE_OPTIONS}")
-  set_property(TARGET LAPACK::LAPACK PROPERTY INTERFACE_LINK_LIBRARIES "${LAPACK_LIBRARY};${BLAS_LIBRARY}")
-  set_property(TARGET LAPACK::LAPACK PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${LAPACK_INCLUDE_DIR}")
+  set_property(TARGET LAPACK::LAPACK PROPERTY INTERFACE_LINK_LIBRARIES "${LAPACK_LIBRARIES}")
+  set_property(TARGET LAPACK::LAPACK PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${LAPACK_INCLUDE_DIRS}")
 endif()
 
 if(LAPACK_LAPACK95_FOUND)
