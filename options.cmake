@@ -2,6 +2,8 @@ option(MUMPS_BUILD_TESTING "Build tests" ${MUMPS_IS_TOP_LEVEL})
 
 option(MUMPS_find_static "Find static libraries for Lapack and Scalapack (default shared then static search)")
 
+option(MUMPS_find_metis "Try to find METIS / ParMETIS before building it. Implied by -DMETIS_ROOT=")
+
 if(NOT DEFINED MUMPS_USE_MKL AND (DEFINED ENV{MKLROOT} AND IS_DIRECTORY "$ENV{MKLROOT}"))
   set(MUMPS_USE_MKL true)
 endif()

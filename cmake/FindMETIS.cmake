@@ -48,6 +48,18 @@ PATH_SUFFIXES METIS libmetis
 DOC "METIS library"
 )
 
+# METIS >= 5.2 keeps GKlib as a separate library, so an installed METIS needs it too or the
+# gk_* symbols stay unresolved. Some packagings bundle GKlib into libmetis -- among them the
+# METIS built by this superbuild -- so it is optional and only added when found.
+find_library(GKLIB_LIBRARY
+NAMES GKlib gklib
+PATH_SUFFIXES METIS libmetis GKlib
+DOC "GKlib library, needed by METIS >= 5.2 unless bundled into the METIS library"
+)
+if(NOT GKLIB_LIBRARY)
+  set(GKLIB_LIBRARY)
+endif()
+
 if(ParMETIS IN_LIST METIS_FIND_COMPONENTS)
   set(metis_inc parmetis.h)
 else()
@@ -60,7 +72,7 @@ PATH_SUFFIXES METIS
 DOC "METIS include directory"
 )
 
-set(METIS_LIBRARIES ${PARMETIS_LIBRARY} ${METIS_LIBRARY})
+set(METIS_LIBRARIES ${PARMETIS_LIBRARY} ${METIS_LIBRARY} ${GKLIB_LIBRARY})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(METIS
@@ -76,7 +88,7 @@ if(METIS_FOUND)
 
   if(NOT TARGET METIS::METIS)
     add_library(METIS::METIS INTERFACE IMPORTED)
-    set_property(TARGET METIS::METIS PROPERTY INTERFACE_LINK_LIBRARIES "${METIS_LIBRARY}")
+    set_property(TARGET METIS::METIS PROPERTY INTERFACE_LINK_LIBRARIES "${METIS_LIBRARY};${GKLIB_LIBRARY}")
     set_property(TARGET METIS::METIS PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${METIS_INCLUDE_DIR}")
   endif()
 
@@ -88,4 +100,4 @@ if(METIS_FOUND)
 
 endif(METIS_FOUND)
 
-mark_as_advanced(METIS_INCLUDE_DIR METIS_LIBRARY PARMETIS_LIBRARY)
+mark_as_advanced(METIS_INCLUDE_DIR METIS_LIBRARY PARMETIS_LIBRARY GKLIB_LIBRARY)
