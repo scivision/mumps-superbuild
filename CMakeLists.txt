@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25...4.5)
 # CMake >= 3.24 for FetchContent FIND_PACKAGE_ARGS
 # CMAKE >= 3.25 for block(), VALIDATOR on find_*()
 
-set(MUMPS_PROJECT_VERSION 5.9.1.0)
+set(MUMPS_PROJECT_VERSION 5.9.1.1)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "Please use out of source build:
@@ -177,7 +177,7 @@ endif()
 # -- Scalapack / MPI
 if(MUMPS_parallel)
   find_package(MPI COMPONENTS C Fortran REQUIRED)
-  if(NOT DEFINED ENV{MKLROOT} AND NOT LAPACK_VENDOR MATCHES "^MKL" OR NOT MUMPS_scalapack)
+  if(NOT MUMPS_USE_MKL OR NOT MUMPS_scalapack)
     # oneMKL MKLConfig.cmake must be invoked only once
     include(cmake/lapack.cmake)
   endif()

@@ -2,7 +2,7 @@ option(MUMPS_BUILD_TESTING "Build tests" ${MUMPS_IS_TOP_LEVEL})
 
 option(MUMPS_find_static "Find static libraries for Lapack and Scalapack (default shared then static search)")
 
-if(NOT DEFINED MUMPS_USE_MKL AND (DEFINED ENV{MKLROOT} AND IS_DIRECTORY "$ENV{MKLROOT}"))
+if(NOT DEFINED MUMPS_USE_MKL AND ((DEFINED ENV{MKLROOT} AND IS_DIRECTORY "$ENV{MKLROOT}") OR LAPACK_VENDOR STREQUAL "MKL" OR SCALAPACK_VENDOR STREQUAL "MKL"))
   set(MUMPS_USE_MKL true)
 endif()
 

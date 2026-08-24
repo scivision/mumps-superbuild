@@ -19,6 +19,8 @@ COMPONENTS
 
 ``INT64``
   64-bit integers (default 32-bit integers is what most users want and what most libraries have)
+  Note: due to the non-interface design of Scalapack, the integer bitness isn't verified in this
+  FindSCALAPACK module.
 
 ``MKL``
   Intel MKL for MSVC, oneAPI, GCC.
@@ -213,6 +215,9 @@ VALIDATOR scalapack_check
 
 if(SCALAPACK_LIBRARY)
   set(SCALAPACK_AOCL_FOUND true PARENT_SCOPE)
+  if(INT64 IN_LIST SCALAPACK_FIND_COMPONENTS)
+    set(SCALAPACK_INT64_FOUND true PARENT_SCOPE)
+  endif()
 endif()
 
 endfunction()
@@ -221,16 +226,28 @@ endfunction()
 
 function(scalapack_netlib)
 
+if(INT64 IN_LIST SCALAPACK_FIND_COMPONENTS)
+  set(_names scalapack64 scalapack64-openmpi scalapack64-mpich scalapack)
+else()
+  set(_names scalapack scalapack-openmpi scalapack-mpich)
+endif()
+
 # Names to search for:
 # scalapack-{openmpi,mpich}: Ubuntu and similar
 # "scalapack":               RHEL-like distros, Netlib, etc.
 find_library(SCALAPACK_LIBRARY
-NAMES scalapack scalapack-openmpi scalapack-mpich
-NAMES_PER_DIR
+NAMES ${_names}
 PATH_SUFFIXES openmpi/lib mpich/lib
 DOC "SCALAPACK library"
 VALIDATOR scalapack_check
 )
+
+if(SCALAPACK_LIBRARY)
+  set(SCALAPACK_Netlib_FOUND true PARENT_SCOPE)
+  if(INT64 IN_LIST SCALAPACK_FIND_COMPONENTS)
+    set(SCALAPACK_INT64_FOUND true PARENT_SCOPE)
+  endif()
+endif()
 
 endfunction()
 
@@ -247,6 +264,8 @@ endif()
 
 if(MKL IN_LIST SCALAPACK_FIND_COMPONENTS)
   scalapack_mkl()
+elseif(Netlib IN_LIST SCALAPACK_FIND_COMPONENTS)
+  scalapack_netlib()
 elseif(SCALAPACK_CRAY)
   # Cray PE has Scalapack build into LibSci. Use Cray compiler wrapper.
 elseif(AOCL IN_LIST LAPACK_FIND_COMPONENTS)
