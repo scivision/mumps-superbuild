@@ -94,13 +94,8 @@ include(GNUInstallDirs)
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
   if(CMAKE_GENERATOR MATCHES "Ninja")
-    if(WIN32)
-      set(_g "MinGW Makefiles")
-    else()
-      set(_g "Unix Makefiles")
-    endif()
-    message(WARNING "MUMPS: LLVM Flang with Ninja generator may fail to build. https://gitlab.kitware.com/cmake/cmake/-/issues/27702
-    Recommend using Makefiles generator instead:   cmake -G \"${_g}\" -B build --fresh")
+    set(MUMPS_Ninja_preprocess_workaround true)
+    message(STATUS "MUMPS: using LLVM Flang with Ninja generator workaround.")
   endif()
 
   if(MUMPS_UPSTREAM_VERSION VERSION_LESS 5.9.1 AND NOT MUMPS_openmp)

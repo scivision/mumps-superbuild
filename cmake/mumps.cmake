@@ -186,6 +186,15 @@ list(TRANSFORM SRC_C PREPEND ${a})
 
 mumps_get_src(SRC_Fortran arith_fortran base)
 
+if(MUMPS_Ninja_preprocess_workaround)
+  # We have asked MUMPS devs to use different syntax, but they declined as this is really a Flang bug.
+  # we have opened an LLVM bug report https://github.com/llvm/llvm-project/issues/202815
+  # this workaround works because these 3 source files don't depend on each other for Fortran modules,
+  # so we can skip Ninja module dependency discovery for these files as a workaround for
+  # https://gitlab.kitware.com/cmake/cmake/-/issues/27702
+  set_property(SOURCE ${a}fac_asm.F ${a}fac_asm_master_m.F ${a}fac_asm_master_ELT_m.F PROPERTY Fortran_PREPROCESS false)
+endif()
+
 if(MUMPS_ACTUAL_VERSION VERSION_GREATER_EQUAL 5.3)
   mumps_get_src(_c arith_fortran ge_5_3)
   list(APPEND SRC_Fortran ${_c})

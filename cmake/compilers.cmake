@@ -36,7 +36,14 @@ list(APPEND mumps_cflags $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU,IntelLLV
 list(APPEND mumps_cflags
 "$<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU,IntelLLVM>:-fno-strict-aliasing>"
 )
-list(APPEND mumps_fflags "$<$<COMPILE_LANG_AND_ID:Fortran,FlangLLVM,GNU>:-fno-strict-aliasing>")
+list(APPEND mumps_fflags "$<$<COMPILE_LANG_AND_ID:Fortran,GNU>:-fno-strict-aliasing>")
+
+# Workaround for LLVM AArch64 Windows codegen bug that emits incorrect SEH unwind directives
+# for leaf functions with frame-pointer omission, causing MC assembler errors like:
+# "Incorrect size for ... prologue: N bytes of instructions in range, but .seh directives corresponding to M bytes".
+if(WIN32 AND CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64")
+  list(APPEND mumps_fflags "$<$<COMPILE_LANG_AND_ID:Fortran,LLVMFlang>:-fno-omit-frame-pointer>")
+endif()
 
 list(APPEND mumps_fflags
 "$<$<COMPILE_LANG_AND_ID:Fortran,IntelLLVM>:-warn:declarations>"
