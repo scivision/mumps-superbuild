@@ -72,9 +72,8 @@ if(MUMPS_ACTUAL_VERSION VERSION_GREATER_EQUAL 5.8)
   mumps_get_src(_c comm_c ge_5_8)
   list(APPEND COMM_OTHER_C ${_c})
   if(WIN32 AND MUMPS_HAVE_AVX512VBM)
-    get_property(_flytes_cflags SOURCE mumps_flytes.c PROPERTY COMPILE_OPTIONS)
-    set_property(SOURCE mumps_flytes.c
-      PROPERTY COMPILE_OPTIONS "${_flytes_cflags};$<$<COMPILE_LANG_AND_ID:C,IntelLLVM>:-Wno-incompatible-pointer-types>")
+    set_property(SOURCE mumps_flytes.c APPEND
+      PROPERTY COMPILE_OPTIONS "$<$<COMPILE_LANG_AND_ID:C,IntelLLVM>:-Wno-incompatible-pointer-types>")
   endif()
 endif()
 if(MUMPS_ACTUAL_VERSION VERSION_GREATER_EQUAL 5.9)
