@@ -42,6 +42,17 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_C_COMPILER_ID STREQUA
   set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE OPT_IN)
 endif()
 
+# needed for CMake < 3.29: else CMake errors.
+set(_scalapack_fpa)
+if(DEFINED SCALAPACK_VENDOR AND NOT SCALAPACK_VENDOR STREQUAL "")
+  set(_scalapack_fpa COMPONENTS ${SCALAPACK_VENDOR})
+endif()
+
+FetchContent_Declare(SCALAPACK
+URL ${scalapack_url}
+FIND_PACKAGE_ARGS ${_scalapack_fpa}
+)
+
 FetchContent_Declare(SCALAPACK
 URL ${scalapack_url}
 FIND_PACKAGE_ARGS COMPONENTS ${SCALAPACK_VENDOR}
