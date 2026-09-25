@@ -1,4 +1,3 @@
-# CMake >= 3.28 strongly recommended for build graph reliability
 cmake_minimum_required(VERSION 3.25...4.5)
 # CMake >= 3.24 for FetchContent FIND_PACKAGE_ARGS
 # CMAKE >= 3.25 for block(), VALIDATOR on find_*()
@@ -76,10 +75,6 @@ VERSION ${MUMPS_PROJECT_VERSION}
 DESCRIPTION "Sparse direct parallel solver"
 HOMEPAGE_URL "https://mumps-solver.org/"
 )
-if(CMAKE_VERSION VERSION_LESS 3.28)
-  message(WARNING "CMake >= 3.28 is strongly recommended for reliable build graph and minimal rebuilds, but you are using ${CMAKE_VERSION}.
-  Consider upgrading CMake if you experience build failures.")
-endif()
 
 if(CMAKE_VERSION VERSION_GREATER 3.30.0 AND CMAKE_VERSION VERSION_LESS 3.30.4)
 cmake_policy(SET CMP0168 OLD)
