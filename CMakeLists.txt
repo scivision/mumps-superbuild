@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.26...4.5)
 # CMake >= 3.25 for block(), VALIDATOR on find_*()
 # CMake >= 3.24 for FetchContent FIND_PACKAGE_ARGS
 
-set(MUMPS_PROJECT_VERSION 5.9.1.1)
+set(MUMPS_PROJECT_VERSION 5.9.1.2)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "Please use out of source build:
