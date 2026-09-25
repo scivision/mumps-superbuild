@@ -165,7 +165,7 @@ jobs:
 
     strategy:
       matrix:
-        cmake_version: ["3.25.3"]
+        cmake_version: ["3.26.6"]
 
     steps:
     - *checkout

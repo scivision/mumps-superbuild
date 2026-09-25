@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.25...4.5)
+cmake_minimum_required(VERSION 3.26...4.5)
+# CMake >= 3.26 as Scalapack build gives confusing errors and even closes Terminal with too old CMake.
+# CMake >= 3.25 for block(), VALIDATOR on find_*()
 # CMake >= 3.24 for FetchContent FIND_PACKAGE_ARGS
-# CMAKE >= 3.25 for block(), VALIDATOR on find_*()
 
 set(MUMPS_PROJECT_VERSION 5.9.1.1)
 
