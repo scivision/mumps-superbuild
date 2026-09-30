@@ -3,9 +3,9 @@
 The Fortran library MUMPS builds on Windows just as well as other operating systems.
 Methods of building MUMPS on Windows include:
 
-* Windows Subsystem for Linux (WSL) -- recommended in general for scientific computing on Windows
+* Windows Subsystem for Linux (WSL) - GCC GFortran, LLVM Flang
 * [Intel oneAPI Fortran compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/oneapi-toolkit-download.html) with oneAPI C compiler `icx` or Visual Studio C compiler `cl`
-* MSYS2 (GCC / GFortran)
+* MSYS2 - GCC GFortran, LLVM Flang
 
 CMake and Ninja can be installed on native Windows via WinGet:
 
@@ -36,14 +36,6 @@ Alternatively, tell CMake the full path to Ninja like:
 ```sh
 cmake -G Ninja -B build -DCMAKE_MAKE_PROGRAM=path/to/ninja.exe
 ```
-
-## Compiler
-
-Windows compilers known to work:
-
-* Windows Subsystem for Linux (recommended in general for scientific computing on Windows)
-* Intel [oneAPI](./Readme_oneapi.md)  -- requires oneAPI Toolkit for LAPACK, ScaLAPACK, and Intel MPI
-* MSYS2
 
 ## CMake configure output
 
@@ -86,3 +78,11 @@ Optionally, run self-tests:
 ```sh
 ctest --test-dir build
 ```
+
+## MinGW patch
+
+GCC Gfortran on Windows in general has issues with msmpi "mpif.h" as used by MUMPS in parallel builds.
+We implemented a
+[patch](./cmake/mumps_mingw_mpi.patch)
+using code from MSYS2 msmpi package to address this issue.
+We've asked the MUMPS dev team to switch MUMPS to MPI-2 `use mpi` from MPI-1 `include 'mpif.h'` since that header is deprecated by MPI-4.1 standard.
