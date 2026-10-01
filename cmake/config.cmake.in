@@ -82,8 +82,32 @@ if(MUMPS_parmetis)
 endif()
 
 set(MUMPS_openmp @MUMPS_openmp@)
+set(MUMPS_shared @BUILD_SHARED_LIBS@)
 if(MUMPS_openmp)
-  find_dependency(OpenMP COMPONENTS C Fortran)
+  # Nothing in MUMPS-targets.cmake references OpenMP::*, and a shared MUMPS already records its
+  # own OpenMP runtime, so consumers do not need OpenMP to link it. Requiring it unconditionally
+  # locks out consumers that enable only C (the Fortran component can never be satisfied) and
+  # consumers whose C compiler has no OpenMP, e.g. AppleClang without libomp.
+  # A static MUMPS does need the flags on the consumer's link line, so keep it required there.
+  get_property(_mumps_langs GLOBAL PROPERTY ENABLED_LANGUAGES)
+  set(_mumps_omp_components)
+  foreach(_mumps_lang IN ITEMS C Fortran)
+    if(_mumps_lang IN_LIST _mumps_langs)
+      list(APPEND _mumps_omp_components ${_mumps_lang})
+    endif()
+  endforeach()
+
+  if(_mumps_omp_components)
+    if(MUMPS_shared)
+      find_package(OpenMP COMPONENTS ${_mumps_omp_components})
+    else()
+      find_dependency(OpenMP COMPONENTS ${_mumps_omp_components})
+    endif()
+  endif()
+
+  unset(_mumps_langs)
+  unset(_mumps_lang)
+  unset(_mumps_omp_components)
 endif()
 
 # all dependencies must be determined before this project's targets
