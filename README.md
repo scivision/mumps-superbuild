@@ -216,6 +216,23 @@ cmake --workflow default
 
 ## Using binary libraries
 
+### From CMake
+
+The install ships a CMake package. Point `CMAKE_PREFIX_PATH` at the install prefix and link the
+arithmetic targets you need:
+
+```cmake
+find_package(MUMPS CONFIG REQUIRED)
+target_link_libraries(myapp PRIVATE MUMPS::DMUMPS)   # or MUMPS::MUMPS for every arithmetic built
+```
+
+```sh
+cmake -B build -DCMAKE_PREFIX_PATH=~/.local
+```
+
+Consumers that enable only C are supported; the package does not require the consumer to have a
+Fortran compiler or OpenMP.
+
 Linking the MUMPS binaries into a user-program is project-dependent.
 An example using the examples in this project with GNU GCC, using the "mpicxx" MPI compiler wrapper:
 
