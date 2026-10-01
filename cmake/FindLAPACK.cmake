@@ -92,6 +92,12 @@ if(NOT Fortran IN_LIST enabled_langs)
   return()
 endif()
 
+# check_source_compiles caches its result, so the result variable has to be keyed on the
+# candidate library. Otherwise the first candidate that fails to link -- a static library
+# needing extra link libraries, say -- caches a negative result, and the test is then skipped
+# for every later candidate, rejecting libraries that do work.
+string(MAKE_C_IDENTIFIER "${path}" _id)
+
 set(CMAKE_REQUIRED_FLAGS)
 set(CMAKE_REQUIRED_LINK_OPTIONS)
 set(CMAKE_REQUIRED_INCLUDES)
@@ -104,9 +110,9 @@ implicit none
 real(rk), external :: snrm2
 print *, snrm2(1, [0._rk], 1)
 end program"
-LAPACK_s_FOUND
+LAPACK_s_FOUND_${_id}
 )
-if(LAPACK_s_FOUND)
+if(LAPACK_s_FOUND_${_id})
   return()
 endif()
 
@@ -117,9 +123,9 @@ implicit none
 real(rk), external :: dnrm2
 print *, dnrm2(1, [0._rk], 1)
 end program"
-LAPACK_d_FOUND
+LAPACK_d_FOUND_${_id}
 )
-if(LAPACK_d_FOUND)
+if(LAPACK_d_FOUND_${_id})
   return()
 endif()
 
@@ -130,9 +136,9 @@ implicit none
 real(rk), external :: scnrm2
 print *, scnrm2(1, [(0._rk, 0._rk)], 1)
 end program"
-LAPACK_c_FOUND
+LAPACK_c_FOUND_${_id}
 )
-if(LAPACK_c_FOUND)
+if(LAPACK_c_FOUND_${_id})
   return()
 endif()
 
@@ -143,9 +149,9 @@ implicit none
 real(rk), external :: dznrm2
 print *, dznrm2(1, [(0._rk, 0._rk)], 1)
 end program"
-LAPACK_z_FOUND
+LAPACK_z_FOUND_${_id}
 )
-if(LAPACK_z_FOUND)
+if(LAPACK_z_FOUND_${_id})
   return()
 endif()
 
