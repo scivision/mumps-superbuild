@@ -121,7 +121,7 @@ if(WIN32 AND BUILD_SHARED_LIBS)
 endif()
 
 if(MUMPS_parallel AND WIN32 AND CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-  include(mumps_mingw_mpi.cmake)
+  include(cmake/mumps_mingw_mpi.cmake)
 endif()
 
 # --- RPATH handling for transitive dependencies
