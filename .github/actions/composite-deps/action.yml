@@ -39,7 +39,7 @@ runs:
   - name: Install ParMETIS (Linux)
     shell: bash
     if: ${{ runner.os == 'Linux' && contains(matrix.preset, 'parmetis') }}
-    run: sudo apt install --no-install-recommends libparmetis-dev
+    run: sudo apt install --no-install-recommends libscotchparmetis-dev
 
   - name: Install MPI (macOS)
     shell: bash

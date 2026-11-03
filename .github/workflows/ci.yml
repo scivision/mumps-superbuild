@@ -16,9 +16,11 @@ on:
       - "**.txt"
       - "cmake/*.json"
       - ".github/workflows/ci.yml"
+      - ".github/actions/**"
       - "!scripts/*"
 
   workflow_dispatch:
+  pull_request:
 
 # avoid wasted runs
 concurrency:
