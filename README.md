@@ -6,9 +6,11 @@
 [![oneapi-linux](https://github.com/scivision/mumps-superbuild/actions/workflows/oneapi-linux.yml/badge.svg)](https://github.com/scivision/mumps-superbuild/actions/workflows/oneapi-linux.yml)
 
 MUMPS is a Fortran library by the
-MUMPS Technologies team co-founded by Jean-Yves L'Excellent from Graal / ROMA
-with optional C interfaces for MPI and/or OpenMP parallel
+MUMPS Technologies team co-founded by Jean-Yves L'Excellent from Graal / ROMA.
+MUMPS has optional C interfaces for MPI and/or OpenMP parallel
 (or serial `cmake --workflow nompi`) solving of sparse linear systems of equations.
+Once MUMPS has been built / packaged, a consuming project doesn't have to have a Fortran compiler.
+
 This repository provides a CMake superbuild project using CMake's built-in
 [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html)
 module for MUMPS and optional MUMPS dependencies including ScaLAPACK, ParMETIS, and Scotch.
@@ -218,7 +220,7 @@ cmake --workflow default
 
 ### From CMake
 
-The install ships a CMake package. Point `CMAKE_PREFIX_PATH` at the install prefix and link the
+The install ships a CMake package. Point `CMAKE_PREFIX_PATH` or `MUMPS_ROOT` at the install prefix and link the
 arithmetic targets you need:
 
 ```cmake
