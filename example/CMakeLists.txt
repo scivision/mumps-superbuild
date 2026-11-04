@@ -52,7 +52,11 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/mpi_launcher.cmake)
 function(precision_ex a lang)
 
   add_executable(${a}_example_${lang} ${a}_example.${lang})
-  target_link_libraries(${a}_example_${lang} PRIVATE MUMPS::MUMPS MPI::MPI_Fortran)
+  target_link_libraries(${a}_example_${lang} PRIVATE MUMPS::MUMPS
+  $<$<BOOL:${MUMPS_parmetis}>:PARMETIS::PARMETIS>
+  MPI::MPI_Fortran
+  )
+  # PARMETIS::PARMETIS needed to ensure MPI is linked after parmetis
   if(lang STREQUAL "cpp")
     target_link_libraries(${a}_example_${lang} PRIVATE
       $<$<BOOL:${MUMPS_openmp}>:OpenMP::OpenMP_CXX>

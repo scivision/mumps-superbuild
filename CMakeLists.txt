@@ -255,45 +255,38 @@ if(MUMPS_scotch)
   list(APPEND ORDERING_DEFS scotch $<$<BOOL:${MUMPS_parallel}>:ptscotch>)
 endif()
 
-
+# --- METIS / ParMETIS ordering definitions
 
 if(MUMPS_metis OR MUMPS_parmetis)
   set(IDXTYPEWIDTH 32)
   if(MUMPS_intsize64)
     set(IDXTYPEWIDTH 64)
   endif()
-
-  if(MUMPS_parmetis)
-    set(_metis_components COMPONENTS ParMETIS)
-  else()
-    set(_metis_components)
-  endif()
-
-  # Check if 'metis_url' hasn't been defined by the user (with -D)
-  if(NOT DEFINED metis_url)
-    if(MUMPS_parmetis)
-      list(APPEND ORDERING_DEFS parmetis)
-      string(JSON metis_url GET "${json}" "parmetis")
-    else()
-      string(JSON metis_url GET "${json}" "metis")
-    endif()
-  endif()
-
-  FetchContent_Declare(mumps_metis
-  URL ${metis_url}
-  FIND_PACKAGE_ARGS ${_metis_components}
-  )
-
-  FetchContent_MakeAvailable(mumps_metis)
-
-  list(APPEND ORDERING_DEFS REALTYPEWIDTH=32 IDXTYPEWIDTH=${IDXTYPEWIDTH} metis)
-
+  list(APPEND ORDERING_DEFS REALTYPEWIDTH=32 IDXTYPEWIDTH=${IDXTYPEWIDTH})
 endif()
 
+if(MUMPS_parmetis)
+  if(NOT DEFINED parmetis_url)
+    string(JSON parmetis_url GET "${json}" "parmetis")
+  endif()
+  FetchContent_Declare(PARMETIS URL ${parmetis_url} FIND_PACKAGE_ARGS)
+  FetchContent_MakeAvailable(PARMETIS)
+  list(APPEND ORDERING_DEFS parmetis)
+elseif(MUMPS_metis)
+  if(NOT DEFINED metis_url)
+    string(JSON metis_url GET "${json}" "metis")
+  endif()
+  FetchContent_Declare(METIS URL ${metis_url} FIND_PACKAGE_ARGS)
+  FetchContent_MakeAvailable(METIS)
+  list(APPEND ORDERING_DEFS metis)
+endif()
+
+# --- Install CMake find modules for dependencies
 install(FILES
 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLAPACK.cmake
 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindSCALAPACK.cmake
 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMETIS.cmake
+${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPARMETIS.cmake
 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindSCOTCH.cmake
 DESTINATION cmake
 )

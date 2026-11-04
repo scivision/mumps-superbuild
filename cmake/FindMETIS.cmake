@@ -7,17 +7,11 @@ FindMETIS
 -------
 
 Finds the METIS library.
-NOTE: If libparmetis used, libmetis must also be linked.
-
-COMPONENTS
-^^^^^^^^^^
-
-ParMETIS - Find the ParMETIS library
 
 Imported Targets
 ^^^^^^^^^^^^^^^^
 
-metis::metis - The METIS library
+METIS::METIS - The METIS library
 
 Result Variables
 ^^^^^^^^^^^^^^^^
@@ -30,17 +24,6 @@ METIS_INCLUDE_DIRS
 
 #]=======================================================================]
 
-
-if(ParMETIS IN_LIST METIS_FIND_COMPONENTS)
-  find_library(PARMETIS_LIBRARY
-  NAMES parmetis
-  PATH_SUFFIXES METIS libmetis
-  DOC "ParMETIS library"
-  )
-  if(PARMETIS_LIBRARY)
-    set(METIS_ParMETIS_FOUND true)
-  endif()
-endif()
 
 find_library(METIS_LIBRARY
 NAMES metis
@@ -57,31 +40,24 @@ PATH_SUFFIXES METIS libmetis GKlib
 DOC "GKlib library, needed by METIS >= 5.2 unless bundled into the METIS library"
 )
 
-if(ParMETIS IN_LIST METIS_FIND_COMPONENTS)
-  set(metis_inc parmetis.h)
-else()
-  set(metis_inc metis.h)
-endif()
-
 find_path(METIS_INCLUDE_DIR
-NAMES ${metis_inc}
+NAMES metis.h
 PATH_SUFFIXES METIS
 DOC "METIS include directory"
 )
 
-set(METIS_LIBRARIES ${PARMETIS_LIBRARY} ${METIS_LIBRARY})
-if(GKLIB_LIBRARY)
-  list(APPEND METIS_LIBRARIES ${GKLIB_LIBRARY})
-endif()
-
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(METIS
-REQUIRED_VARS METIS_LIBRARIES METIS_INCLUDE_DIR
-HANDLE_COMPONENTS
+REQUIRED_VARS METIS_LIBRARY METIS_INCLUDE_DIR
 )
 
 if(METIS_FOUND)
   set(METIS_INCLUDE_DIRS ${METIS_INCLUDE_DIR})
+
+  set(METIS_LIBRARIES ${METIS_LIBRARY})
+  if(GKLIB_LIBRARY)
+    list(APPEND METIS_LIBRARIES ${GKLIB_LIBRARY})
+  endif()
 
   message(VERBOSE "METIS libraries: ${METIS_LIBRARIES}
   METIS include directories: ${METIS_INCLUDE_DIRS}")
@@ -96,12 +72,6 @@ if(METIS_FOUND)
     set_property(TARGET METIS::METIS PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${METIS_INCLUDE_DIR}")
   endif()
 
-  if(NOT TARGET PARMETIS::PARMETIS AND ParMETIS IN_LIST METIS_FIND_COMPONENTS)
-    add_library(PARMETIS::PARMETIS INTERFACE IMPORTED)
-    set_property(TARGET PARMETIS::PARMETIS PROPERTY INTERFACE_LINK_LIBRARIES "${PARMETIS_LIBRARY}")
-    set_property(TARGET PARMETIS::PARMETIS PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${METIS_INCLUDE_DIR}")
-  endif()
-
 endif(METIS_FOUND)
 
-mark_as_advanced(METIS_INCLUDE_DIR METIS_LIBRARY PARMETIS_LIBRARY)
+mark_as_advanced(METIS_INCLUDE_DIR METIS_LIBRARY GKLIB_LIBRARY)

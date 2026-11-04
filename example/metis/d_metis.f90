@@ -1,4 +1,4 @@
-program test_scotch
+program test_metis
 implicit none
 external :: mumps_metis_idxsize
 integer :: idxsize

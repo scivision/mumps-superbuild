@@ -54,8 +54,13 @@ if(MUMPS_scotch)
 endif()
 
 set(MUMPS_metis @MUMPS_metis@)
-if(MUMPS_metis)
+set(MUMPS_parmetis @MUMPS_parmetis@)
+
+if(MUMPS_metis OR MUMPS_parmetis)
   find_dependency(METIS)
+endif()
+if(MUMPS_parmetis)
+  find_dependency(PARMETIS)
 endif()
 
 set(MUMPS_gpu @MUMPS_gpu@)
@@ -68,11 +73,6 @@ set(MUMPS_xkblas @MUMPS_xkblas@)
 set(MUMPS_HAVE_GEMMT @BLAS_HAVE_GEMMT@)
 
 set(MUMPS_HAVE_AVX512VBMI @MUMPS_HAVE_AVX512VBMI@)
-
-set(MUMPS_parmetis @MUMPS_parmetis@)
-if(MUMPS_parmetis)
-  find_dependency(METIS COMPONENTS ParMETIS)
-endif()
 
 set(MUMPS_openmp @MUMPS_openmp@)
 set(MUMPS_shared @BUILD_SHARED_LIBS@)
