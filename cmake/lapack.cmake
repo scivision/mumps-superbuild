@@ -12,4 +12,9 @@ if(MUMPS_find_static)
   list(APPEND LAPACK_VENDOR STATIC)
 endif()
 
-find_package(LAPACK REQUIRED COMPONENTS ${LAPACK_VENDOR})
+if(Accelerate IN_LIST LAPACK_VENDOR AND INT64 IN_LIST LAPACK_VENDOR)
+  # Accelerate's ILP64 symbols need linker aliases to be reachable from Fortran
+  include(${CMAKE_CURRENT_LIST_DIR}/accelerate_ilp64.cmake)
+else()
+  find_package(LAPACK REQUIRED COMPONENTS ${LAPACK_VENDOR})
+endif()
