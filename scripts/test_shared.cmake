@@ -13,10 +13,10 @@ set(BUILD_SINGLE off)
 set(BUILD_DOUBLE on)
 set(BUILD_SHARED_LIBS on)
 # set(FCs flang gfortran gfortran)
-set(FCs gfortran gfortran)
+set(CCs gcc)
+set(FCs gfortran)
 
 if(APPLE)
-  # update periodically with latest Homebrew GCC version, as 'gcc' is AppleClang
   set(CCs clang)
   find_program(brew NAMES brew)
   if(brew)
@@ -27,33 +27,56 @@ if(APPLE)
     # sort to get latest version last
     list(SORT cand COMPARE NATURAL)
     list(GET cand -1 _latest_gcc)
+
     list(APPEND CCs ${_latest_gcc})
+    list(APPEND FCs gfortran)
   endif()
 endif()
 
-message(VERBOSE "CCs: ${CCs}")
+message(STATUS "CCs: ${CCs}")
+message(STATUS "FCs: ${FCs}")
 
+function(build_and_test)
+cmake_path(GET CMAKE_C_COMPILER STEM cc)
+cmake_path(GET CMAKE_Fortran_COMPILER STEM fc)
+
+set(bindir ${tempdir}/mumps_shared_build_${MUMPS_parallel}_${MUMPS_openmp}_${MUMPS_parmetis}_${cc}_${fc})
+set(prefix ${bindir}/install)
+
+message(STATUS "MUMP_parallel=${MUMPS_parallel}
+MUMP_openmp=${MUMPS_openmp}
+MUMP_parmetis=${MUMPS_parmetis}
+cc=${cc}
+fc=${fc}
+binary_dir: ${bindir}
+temp install dir: ${prefix}"
+)
+
+project_build(${prefix} ${bindir})
+
+execute_process(COMMAND ${CMAKE_CTEST_COMMAND} --test-dir ${bindir} -V)
+
+example_build(${bindir}/example)
+if(NOT build_result EQUAL 0)
+  message(FATAL_ERROR "Build failed for configuration: MUMPS_parallel=${MUMPS_parallel} MUMPS_openmp=${MUMPS_openmp} MUMPS_parmetis=${MUMPS_parmetis} cc=${cc} fc=${fc}")
+endif()
+if(NOT test_result EQUAL 0)
+  message(FATAL_ERROR "Tests failed for configuration: MUMPS_parallel=${MUMPS_parallel} MUMPS_openmp=${MUMPS_openmp} MUMPS_parmetis=${MUMPS_parmetis} cc=${cc} fc=${fc}")
+endif()
+
+endfunction()
 
 foreach(CMAKE_C_COMPILER CMAKE_Fortran_COMPILER IN ZIP_LISTS CCs FCs)
   foreach(MUMPS_parallel IN ITEMS true false)
     foreach(MUMPS_openmp IN ITEMS true false)
-
-      cmake_path(GET CMAKE_C_COMPILER STEM cc)
-      cmake_path(GET CMAKE_Fortran_COMPILER STEM fc)
-
-      set(bindir ${tempdir}/mumps_shared_build_${MUMPS_parallel}_${MUMPS_openmp}_${cc}_${fc})
-      set(prefix ${bindir}/install)
-
-      message(STATUS "MUMP_parallel=${MUMPS_parallel}
-      binary_dir: ${bindir}
-      temp install dir: ${prefix}"
-      )
-
-      project_build(${prefix} ${bindir})
-
-      execute_process(COMMAND ${CMAKE_CTEST_COMMAND} --test-dir ${bindir} -V)
-
-      example_build(${bindir}/example)
+      if(MUMPS_parallel)
+        foreach(MUMPS_parmetis IN ITEMS true false)
+          build_and_test()
+        endforeach()
+      else()
+        set(MUMPS_parmetis false)
+        build_and_test()
+      endif()
     endforeach()
   endforeach()
 endforeach()

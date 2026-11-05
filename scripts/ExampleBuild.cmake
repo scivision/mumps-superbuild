@@ -11,11 +11,15 @@ COMMAND_ERROR_IS_FATAL ANY
 )
 
 execute_process(COMMAND ${CMAKE_COMMAND} --build ${example_bin} --parallel
-COMMAND_ERROR_IS_FATAL ANY
+RESULT_VARIABLE build_result
 )
+set(build_result ${build_result} PARENT_SCOPE)
 
-execute_process(COMMAND ${CMAKE_CTEST_COMMAND} --test-dir ${example_bin} -V
-COMMAND_ERROR_IS_FATAL ANY
-)
+if(build_result EQUAL 0)
+  execute_process(COMMAND ${CMAKE_CTEST_COMMAND} --test-dir ${example_bin} -V
+  RESULT_VARIABLE test_result
+  )
+  set(test_result ${test_result} PARENT_SCOPE)
+endif()
 
 endfunction()
