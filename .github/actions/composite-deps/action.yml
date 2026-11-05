@@ -44,7 +44,14 @@ runs:
   - name: Install MPI (macOS)
     shell: bash
     if: ${{ runner.os == 'macOS' && !contains(matrix.preset, 'nompi') }}
-    run: brew install open-mpi scalapack
+    run: brew install open-mpi
+
+  - name: Install ScaLAPACK (macOS)
+    shell: bash
+    # Homebrew's scalapack requires openblas, which would end up linked alongside Accelerate.
+    # Skip it there and let the superbuild build Reference-ScaLAPACK on Accelerate instead.
+    if: ${{ runner.os == 'macOS' && !contains(matrix.preset, 'nompi') && matrix.lapack_vendor != 'Accelerate' }}
+    run: brew install scalapack
 
   - name: install Scotch (macOS)
     shell: bash
