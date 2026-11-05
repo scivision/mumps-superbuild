@@ -61,6 +61,13 @@ COMPONENTS
   Library search default on non-Windows is shared then static. On Windows default search is static first.
   Specifying STATIC component searches for static libraries only.
 
+Query Variables
+^^^^^^^^^^^^^^^
+
+``LAPACK_DETERMINE_LIBRARY_VERSION``
+  Determine the version of the LAPACK library found, storing it in the variable ``LAPACK_VERSION``
+  (default true)
+
 
 Result Variables
 ^^^^^^^^^^^^^^^^
@@ -74,6 +81,8 @@ Result Variables
 ``LAPACK_INCLUDE_DIRS``
   Lapack include directories (for C/C++)
 
+``LAPACK_VERSION``
+  The version of the LAPACK library found, if requested by ``LAPACK_DETERMINE_LIBRARY_VERSION``
 
 References
 ^^^^^^^^^^
@@ -491,6 +500,10 @@ if(NOT DEFINED LAPACK_CRAY AND DEFINED ENV{CRAYPE_VERSION})
   set(LAPACK_CRAY true)
 endif()
 
+if(NOT DEFINED LAPACK_DETERMINE_LIBRARY_VERSION)
+  set(LAPACK_DETERMINE_LIBRARY_VERSION true)
+endif()
+
 if(STATIC IN_LIST LAPACK_FIND_COMPONENTS)
   set(_orig_suff ${CMAKE_FIND_LIBRARY_SUFFIXES})
   set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX})
@@ -521,15 +534,38 @@ if(STATIC IN_LIST LAPACK_FIND_COMPONENTS)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ${_orig_suff})
 endif()
 
+if(LAPACK_LIBRARY AND LAPACK_DETERMINE_LIBRARY_VERSION AND NOT DEFINED LAPACK_VERSION)
+  set(_lapack_vers_src
+[=[PROGRAM lpv
+implicit none
+integer :: major, minor, patch
+call ilaver( major,minor, patch )
+print '(i0,".",i0,".",i0)', major,minor,patch
+end program
+]=])
+  message(CHECK_START "Determining LAPACK library version")
+  try_run(_lapack_run_ver _lapack_build_ver
+    SOURCE_FROM_VAR main.f90 _lapack_vers_src
+    RUN_OUTPUT_STDOUT_VARIABLE _lapack_version
+    LINK_LIBRARIES ${LAPACK_LIBRARY}
+  )
+  if(_lapack_run_ver EQUAL 0 AND _lapack_build_ver)
+    string(STRIP "${_lapack_version}" _lapack_version)
+    message(CHECK_PASS "${_lapack_version}")
+    set(LAPACK_VERSION ${_lapack_version} CACHE STRING "Version of the LAPACK library")
+  else()
+    message(CHECK_FAIL "failed")
+  endif()
+endif()
 
 
 include(FindPackageHandleStandardArgs)
 
 if(LAPACK_CRAY)
   set(LAPACK_links true)
-  find_package_handle_standard_args(LAPACK REQUIRED_VARS LAPACK_links)
+  find_package_handle_standard_args(LAPACK REQUIRED_VARS LAPACK_links VERSION_VAR LAPACK_VERSION)
 else()
-  find_package_handle_standard_args(LAPACK HANDLE_COMPONENTS REQUIRED_VARS LAPACK_LIBRARIES)
+  find_package_handle_standard_args(LAPACK HANDLE_COMPONENTS REQUIRED_VARS LAPACK_LIBRARIES VERSION_VAR LAPACK_VERSION)
 endif()
 
 if(LAPACK_FOUND)

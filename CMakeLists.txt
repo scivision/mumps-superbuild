@@ -294,7 +294,7 @@ DESTINATION cmake
 message(STATUS "MUMPS ORDERING_DEFS: ${ORDERING_DEFS}")
 message(STATUS "MUMPS C definitions: ${mumps_cdefs}")
 message(STATUS "MUMPS Fortran definitions: ${mumps_fdefs}")
-message(STATUS "MUMPS LAPACK_VENDOR: ${LAPACK_VENDOR}")
+message(STATUS "MUMPS LAPACK_VENDOR: ${LAPACK_VENDOR} LAPACK_VERSION: ${LAPACK_VERSION}")
 message(STATUS "MUMPS SCALAPACK_VENDOR: ${SCALAPACK_VENDOR}")
 
 # --- MUMPS build
