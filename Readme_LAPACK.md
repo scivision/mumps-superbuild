@@ -34,14 +34,16 @@ Accelerate provides BLAS and the legacy LAPACK 3.2.1 Fortran interface, which co
 MUMPS calls. Two caveats:
 
 * Accelerate has no GEMMT extension, so leave `MUMPS_gemmt=off` (the default off MKL).
-* `MUMPS_intsize64=on` is not supported with Accelerate. Accelerate's ILP64 entry points are
-  exported only as `<name>$NEWLAPACK$ILP64` symbols, which a Fortran compiler cannot name. They
-  can be reached by aliasing them onto the usual `<name>_` symbols with the Apple linker's
-  `-alias_list` option, e.g. via
-  [accelerate-lapack](https://github.com/lepus2589/accelerate-lapack). If you do that, the alias
-  list must be generated from the *same* macOS SDK that the Fortran compiler links against, or the
-  link fails on symbols present in one but not the other. Homebrew gfortran has its SDK baked in;
-  check it with `gfortran -v 2>&1 | tr ' ' '\n' | grep sysroot`.
+* `MUMPS_intsize64=on` needs a shim. Accelerate's ILP64 entry points are exported only as
+  `<name>$NEWLAPACK$ILP64` symbols, which a Fortran compiler cannot name.
+  `cmake/accelerate_ilp64.cmake` pulls in
+  [accelerate-lapack](https://github.com/lepus2589/accelerate-lapack), which generates Apple
+  linker alias lists mapping those onto the usual `<name>_` symbols and attaches them to
+  `LAPACK::LAPACK`. The alias list has to come from the *same* macOS SDK the Fortran compiler
+  links against, or the link fails on symbols present in one but not the other, so the SDK is
+  taken from the compiler's baked-in sysroot rather than from `xcrun` (which can report a newer
+  SDK than the installed Accelerate). On macOS 27 accelerate-lapack warns that it found LAPACK
+  3.12.1 where its table expects 3.12.0, which is harmless.
 
 ### Accelerate threading
 
