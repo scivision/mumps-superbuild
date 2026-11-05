@@ -90,6 +90,13 @@
   }
 },
 {
+  "name": "int64-nompi", "inherits": "nompi",
+  "displayName": "with 64-bit integers, without MPI",
+  "cacheVariables": {
+    "MUMPS_intsize64": true
+  }
+},
+{
   "name": "matlab", "inherits": "nompi",
   "binaryDir": "build-matlab",
   "installDir": "${fileDir}/build-matlab/local",
@@ -180,7 +187,8 @@
   { "name": "scotch-metis", "configurePreset": "scotch-metis", "inherits": "default" },
   { "name": "scotch-parmetis", "configurePreset": "scotch-parmetis", "inherits": "scotch" },
   { "name": "parmetis", "configurePreset": "parmetis", "inherits": "default" },
-  { "name": "nompi", "configurePreset": "nompi", "inherits": "default" }
+  { "name": "nompi", "configurePreset": "nompi", "inherits": "default" },
+  { "name": "int64-nompi", "configurePreset": "int64-nompi", "inherits": "default" }
 ],
 "testPresets": [
 {
@@ -223,7 +231,8 @@
 { "name": "scotch-metis", "configurePreset": "scotch-metis", "inherits": "default" },
 { "name": "scotch-parmetis", "configurePreset": "scotch-parmetis", "inherits": "scotch" },
 { "name": "parmetis", "configurePreset": "parmetis", "inherits": "default" },
-{ "name": "nompi", "configurePreset": "nompi", "inherits": "default" }
+{ "name": "nompi", "configurePreset": "nompi", "inherits": "default" },
+{ "name": "int64-nompi", "configurePreset": "int64-nompi", "inherits": "default" }
 ],
 "workflowPresets": [
   { "name": "default", "displayName": "Build and Test in Release mode",
@@ -343,6 +352,13 @@
       { "type": "configure", "name": "nompi" },
       { "type": "build", "name": "nompi" },
       { "type": "test", "name": "nompi" }
+    ]
+  },
+  { "name": "int64-nompi", "displayName": "Build and Test with 64-bit integers, without MPI",
+    "steps": [
+      { "type": "configure", "name": "int64-nompi" },
+      { "type": "build", "name": "int64-nompi" },
+      { "type": "test", "name": "int64-nompi" }
     ]
   }
 ]

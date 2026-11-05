@@ -73,12 +73,16 @@ jobs:
 
 
   accelerate-nompi:
-    # Accelerate against libseq, which is the sequential path the parallel job above does not cover
-    timeout-minutes: 15
+    # Accelerate against libseq, which is the sequential path the parallel job above does not cover.
+    # int64-nompi covers the $NEWLAPACK$ILP64 linker aliases. It has to stay sequential, because
+    # Homebrew's open-mpi has a 4-byte Fortran INTEGER and MUMPS_intsize64 makes MUMPS pass 8-byte
+    # ones, so int64 with MPI cannot work on this runner at all (Intel MPI's ILP64 build is the
+    # only one handled, see CMakeLists.txt).
+    timeout-minutes: 7
 
     strategy:
       matrix:
-        preset: [nompi]
+        preset: [nompi, int64-nompi]
 
     name: macos-latest-Accelerate-${{ matrix.preset }}
     runs-on: macos-latest

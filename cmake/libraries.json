@@ -2,6 +2,7 @@
   "scalapack":  "https://github.com/Reference-ScaLAPACK/scalapack/archive/8ea5880a448cd24622dff95fd1b7394c31e61bda.tar.gz",
   "scotch": "https://github.com/scivision/scotch/archive/60b8febe6261485a94f6d8ba523d5a244a0068b4.tar.gz",
   "parmetis": "https://github.com/scivision/parmetis/archive/175ffe29d7980360a4253cbedb978873e8002bfb.tar.gz",
+  "accelerate_lapack": "https://github.com/lepus2589/accelerate-lapack/archive/refs/tags/v2.0.0.tar.gz",
   "metis": "https://github.com/scivision/metis/archive/456244e99d7f0027706033d18bc1b3424d3507cc.tar.gz",
   "xkblas": "https://github.com/scivision/xkblas/archive/dbb84a2f8503609a871428bbb1da1a3361f9bd62.tar.gz",
   "win_flex_bison": "https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip"
