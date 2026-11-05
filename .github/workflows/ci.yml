@@ -41,6 +41,9 @@ jobs:
           - lapack_vendor: "OpenBLAS"
             os: ubuntu-latest
             name: OpenBLAS
+          - lapack_vendor: "Accelerate"
+            os: macos-latest
+            name: Accelerate
           - mpich: true
             os: ubuntu-latest
             name: MPICH
@@ -67,6 +70,30 @@ jobs:
 
     - name: build example
       uses: ./.github/actions/composite-example
+
+
+  accelerate-nompi:
+    # Accelerate without MPI, so the vendor is exercised without Homebrew ScaLAPACK in the mix
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        preset: [nompi]
+
+    name: macos-latest-Accelerate-${{ matrix.preset }}
+    runs-on: macos-latest
+
+    steps:
+    - *checkout
+    - *prereqs
+    - *macos_fortran
+
+    - name: configure
+      run: cmake --preset ${{ matrix.preset }} -DLAPACK_VENDOR=Accelerate
+
+    - run: cmake --workflow ${{ matrix.preset }}
+
+    - run: cmake --install build
 
 
   gnu-make:
