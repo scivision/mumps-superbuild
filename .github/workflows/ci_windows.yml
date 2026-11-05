@@ -5,6 +5,7 @@ on:
     paths:
       - "**.cmake"
       - "**/CMakeLists.txt"
+      - "cmake/*.json"
       - ".github/workflows/ci_windows.yml"
       - "!scripts/*"
   workflow_dispatch:
