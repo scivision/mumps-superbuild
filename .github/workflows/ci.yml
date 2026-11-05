@@ -73,7 +73,7 @@ jobs:
 
 
   accelerate-nompi:
-    # Accelerate without MPI, so the vendor is exercised without Homebrew ScaLAPACK in the mix
+    # Accelerate against libseq, which is the sequential path the parallel job above does not cover
     timeout-minutes: 15
 
     strategy:
