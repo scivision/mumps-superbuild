@@ -71,6 +71,11 @@ jobs:
     - name: build example
       uses: ./.github/actions/composite-example
 
+    - name: pkg-config consumer
+      uses: ./.github/actions/composite-pkgconfig
+      with:
+        cc: mpicc
+
 
   accelerate-nompi:
     # Accelerate against libseq, which is the sequential path the parallel job above does not cover
@@ -94,6 +99,9 @@ jobs:
     - run: cmake --workflow ${{ matrix.preset }}
 
     - run: cmake --install build
+
+    - name: pkg-config consumer
+      uses: ./.github/actions/composite-pkgconfig
 
 
   gnu-make:
@@ -131,6 +139,12 @@ jobs:
 
     - run: cmake --workflow shared
     - run: cmake --install build-shared
+
+    - name: pkg-config consumer
+      uses: ./.github/actions/composite-pkgconfig
+      with:
+        prefix: build-shared/local
+        cc: mpicc
 
     - name: example workflow
       working-directory: example
@@ -181,6 +195,12 @@ jobs:
 
     - run: cmake --workflow ${{ matrix.preset }}
     - run: cmake --install build-${{ matrix.preset }}
+
+    - name: pkg-config consumer
+      uses: ./.github/actions/composite-pkgconfig
+      with:
+        prefix: build-${{ matrix.preset }}/local
+        cc: mpicc
 
     - name: example workflow
       working-directory: example/${{ matrix.preset }}
