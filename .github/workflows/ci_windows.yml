@@ -30,6 +30,7 @@ jobs:
         install: >-
           mingw-w64-ucrt-x86_64-gcc-fortran
           mingw-w64-ucrt-x86_64-lapack
+          mingw-w64-ucrt-x86_64-pkgconf
 
     - name: Put MSYS2_MinGW64 on PATH
       run: echo "${{ steps.msys2.outputs.msys2-location }}/ucrt64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -44,6 +45,17 @@ jobs:
 
     - name: install package
       run: cmake --install build
+
+    - name: pkg-config consumer
+      shell: msys2 {0}
+      run: |
+        set -e
+        prefix=$(cygpath -m "$PWD")/build/local
+        export PKG_CONFIG_PATH="$prefix/lib/pkgconfig"
+        pkg-config --print-errors --exists dmumps
+        echo "static link line:"
+        pkg-config --static --libs dmumps
+        gcc example/d_example.c $(pkg-config --cflags --static --libs dmumps) -o pkgconfig_consumer
 
     - name: example workflow
       working-directory: example
