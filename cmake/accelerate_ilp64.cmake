@@ -72,3 +72,11 @@ if(_dev_dir_override)
     set(ENV{DEVELOPER_DIR} ${_saved_developer_dir})
   endif()
 endif()
+
+# accelerate-lapack probes ilaver() through the ILP64 aliases as it configures, so report what it
+# found. The FindLAPACK version check cannot run on this path: it keys off LAPACK_LIBRARY, which
+# this path never sets, and a plain Fortran call would reach the legacy 3.2.1 symbol rather than
+# the aliased one anyway.
+if(ACCELERATE_LAPACK_ILAVER_VERSION)
+  set(LAPACK_VERSION ${ACCELERATE_LAPACK_ILAVER_VERSION})
+endif()
