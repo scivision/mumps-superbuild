@@ -57,7 +57,8 @@ jobs:
 
     - &prereqs
       name: install prereqs
-      timeout-minutes: 3
+      timeout-minutes: 5
+      # 3 minutes isn't quite enough for multi-stage installs
       uses: ./.github/actions/composite-deps
 
     - &macos_fortran
