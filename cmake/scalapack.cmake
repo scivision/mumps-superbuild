@@ -28,9 +28,12 @@ if(MUMPS_find_static)
 endif()
 
 
-# build scalapack
-set(SCALAPACK_BUILD_TESTING off)
-set(SCALAPACK_BUILD_TESTS off)
+# Scalapack options
+set(BUILD_TESTING off)
+foreach(_p IN ITEMS SINGLE DOUBLE COMPLEX COMPLEX16)
+  set(SCALAPACK_BUILD_${_p} ${MUMPS_BUILD_${_p}})
+endforeach()
+
 
 # Check if 'scalapack_url' hasn't been defined by the user (with -D)
 if(NOT DEFINED scalapack_url)
