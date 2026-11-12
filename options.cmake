@@ -51,10 +51,19 @@ include(CheckPIESupported)
 check_pie_supported()
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-option(BUILD_SINGLE "Build single precision float32 real" ON)
-option(BUILD_DOUBLE "Build double precision float64 real" ON)
-option(BUILD_COMPLEX "Build single precision complex")
-option(BUILD_COMPLEX16 "Build double precision complex")
+# FIXME: accept deprecated options
+foreach(_p IN ITEMS SINGLE DOUBLE COMPLEX COMPLEX16)
+  if(NOT DEFINED MUMPS_BUILD_${_p} AND DEFINED BUILD_${_p})
+    message(WARNING "Option BUILD_${_p} is deprecated, use MUMPS_BUILD_${_p} instead")
+    set(MUMPS_BUILD_${_p} ${BUILD_${_p}})
+  endif()
+endforeach()
+
+option(MUMPS_BUILD_SINGLE "MUMPS single precision float32 real" ON)
+option(MUMPS_BUILD_DOUBLE "MUMPS double precision float64 real" ON)
+option(MUMPS_BUILD_COMPLEX "MUMPS single precision complex (32 bit real, 32 bit complex)")
+option(MUMPS_BUILD_COMPLEX16 "MUMPS double precision complex (64 bit real, 64 bit complex)")
+
 
 option(MUMPS_ENABLE_RPATH "Enable RPATH in installed MUMPS libraries" OFF)
 

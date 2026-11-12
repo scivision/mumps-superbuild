@@ -19,7 +19,7 @@ if(PROJECT_IS_TOP_LEVEL)
   find_package(MUMPS CONFIG REQUIRED)
 endif()
 
-if(MUMPS_DOUBLE OR BUILD_DOUBLE)
+if(MUMPS_DOUBLE OR MUMPS_BUILD_DOUBLE)
   add_executable(D_gpu mumps_cuda_gpu_example.f90)
   target_link_libraries(D_gpu PRIVATE MUMPS::MUMPS
   MPI::MPI_Fortran

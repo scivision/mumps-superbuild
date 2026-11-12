@@ -14,8 +14,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/oneapi_check.cmake)
 find_package(MKL CONFIG REQUIRED)
 
 # save build time
-set(BUILD_SINGLE off)
-set(BUILD_DOUBLE on)
+set(MUMPS_BUILD_SINGLE off)
+set(MUMPS_BUILD_DOUBLE on)
 option(BUILD_SHARED_LIBS "Build shared libraries")
 
 foreach(MUMPS_parallel IN ITEMS true false)

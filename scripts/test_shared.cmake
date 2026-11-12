@@ -9,8 +9,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/ExampleBuild.cmake)
 
 get_tempdir(tempdir)
 
-set(BUILD_SINGLE off)
-set(BUILD_DOUBLE on)
+set(MUMPS_BUILD_SINGLE off)
+set(MUMPS_BUILD_DOUBLE on)
 set(BUILD_SHARED_LIBS on)
 # set(FCs flang gfortran gfortran)
 set(CCs gcc)

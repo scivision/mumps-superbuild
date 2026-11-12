@@ -10,10 +10,10 @@ can be used for possible performance enhancements.
 The default precision is float64 and float32.
 
 ```cmake
-option(BUILD_SINGLE "Build single precision real" ON)
-option(BUILD_DOUBLE "Build double precision real" ON)
-option(BUILD_COMPLEX "Build single precision complex")
-option(BUILD_COMPLEX16 "Build double precision complex")
+option(MUMPS_BUILD_SINGLE "Build single precision real" ON)
+option(MUMPS_BUILD_DOUBLE "Build double precision real" ON)
+option(MUMPS_BUILD_COMPLEX "Build single precision complex")
+option(MUMPS_BUILD_COMPLEX16 "Build double precision complex")
 ```
 
 ## GPU

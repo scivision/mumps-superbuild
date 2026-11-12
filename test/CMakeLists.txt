@@ -6,7 +6,7 @@ add_executable(print_mumps_options print_mumps_options.f90)
 target_link_libraries(print_mumps_options PRIVATE MUMPS::MUMPS)
 add_test(NAME print_mumps_options COMMAND print_mumps_options)
 
-if(BUILD_DOUBLE)
+if(MUMPS_BUILD_DOUBLE)
   add_executable(test_mumps_config test_mumps.f90)
   target_link_libraries(test_mumps_config PRIVATE MUMPS::MUMPS
   MPI::MPI_Fortran
@@ -19,7 +19,7 @@ if(BUILD_DOUBLE)
   endif()
 endif()
 
-if(BUILD_SINGLE)
+if(MUMPS_BUILD_SINGLE)
   add_executable(test_mumps_simple32 s_simple.f90)
   target_link_libraries(test_mumps_simple32 PRIVATE MUMPS::MUMPS
   MPI::MPI_Fortran
@@ -32,7 +32,7 @@ if(BUILD_SINGLE)
   endif()
 endif()
 
-if(BUILD_DOUBLE)
+if(MUMPS_BUILD_DOUBLE)
   add_executable(test_mumps_simple64 d_simple.f90)
   target_link_libraries(test_mumps_simple64 PRIVATE MUMPS::MUMPS
   MPI::MPI_Fortran

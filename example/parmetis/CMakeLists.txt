@@ -54,7 +54,7 @@ function(precision_ex a)
   test_mpi_launcher(${a}_parmetis_c ${a}_parmetis_c 2)
 endfunction()
 
-if(MUMPS_DOUBLE OR BUILD_DOUBLE)
+if(MUMPS_DOUBLE OR MUMPS_BUILD_DOUBLE)
   precision_ex("d")
 endif()
 

@@ -13,7 +13,7 @@ endif()
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "EXECUTABLE")
 
-if(BUILD_DOUBLE)
+if(MUMPS_BUILD_DOUBLE)
 check_source_compiles(Fortran
 "program check
 use, intrinsic :: iso_fortran_env, only : real64
@@ -30,7 +30,7 @@ if(BLAS_HAVE_dGEMMT)
 endif()
 endif()
 
-if(BUILD_SINGLE)
+if(MUMPS_BUILD_SINGLE)
 check_source_compiles(Fortran
 "program check
 use, intrinsic :: iso_fortran_env, only : real32
@@ -47,7 +47,7 @@ if(BLAS_HAVE_sGEMMT)
 endif()
 endif()
 
-if(BUILD_COMPLEX)
+if(MUMPS_BUILD_COMPLEX)
 check_source_compiles(Fortran
 "program check
 use, intrinsic :: iso_fortran_env, only : real32
@@ -64,7 +64,7 @@ if(BLAS_HAVE_cGEMMT)
 endif()
 endif()
 
-if(BUILD_COMPLEX16)
+if(MUMPS_BUILD_COMPLEX16)
 check_source_compiles(Fortran
 "program check
 use, intrinsic :: iso_fortran_env, only : real64

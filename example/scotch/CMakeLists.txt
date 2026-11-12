@@ -29,7 +29,7 @@ function(precision_ex a)
   set_tests_properties(${a}_scotch PROPERTIES LABELS "mumps:scotch")
 endfunction()
 
-if(MUMPS_d_FOUND OR BUILD_DOUBLE)
+if(MUMPS_d_FOUND OR MUMPS_BUILD_DOUBLE)
   precision_ex("d")
 endif()
 

@@ -9,10 +9,10 @@
   "binaryDir": "build",
   "installDir": "${fileDir}/build/local",
   "cacheVariables": {
-    "BUILD_SINGLE": false,
-    "BUILD_DOUBLE": true,
-    "BUILD_COMPLEX": false,
-    "BUILD_COMPLEX16": false,
+    "MUMPS_BUILD_SINGLE": false,
+    "MUMPS_BUILD_DOUBLE": true,
+    "MUMPS_BUILD_COMPLEX": false,
+    "MUMPS_BUILD_COMPLEX16": false,
     "CMAKE_BUILD_TYPE": "Release",
     "MUMPS_parallel": true,
     "MUMPS_scotch": false,
@@ -95,10 +95,10 @@
   "installDir": "${fileDir}/build-matlab/local",
   "cacheVariables": {
     "MUMPS_matlab": true,
-    "BUILD_SINGLE": false,
-    "BUILD_DOUBLE": true,
-    "BUILD_COMPLEX": false,
-    "BUILD_COMPLEX16": false
+    "MUMPS_BUILD_SINGLE": false,
+    "MUMPS_BUILD_DOUBLE": true,
+    "MUMPS_BUILD_COMPLEX": false,
+    "MUMPS_BUILD_COMPLEX16": false
   }
 },
 {

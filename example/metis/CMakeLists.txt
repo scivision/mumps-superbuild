@@ -29,7 +29,7 @@ function(precision_ex a)
   set_tests_properties(${a}_metis PROPERTIES LABELS "mumps:metis")
 endfunction()
 
-if(MUMPS_DOUBLE OR BUILD_DOUBLE)
+if(MUMPS_DOUBLE OR MUMPS_BUILD_DOUBLE)
   precision_ex("d")
 endif()
 

@@ -299,16 +299,16 @@ TYPE INCLUDE
 
 endfunction()
 
-if(BUILD_SINGLE)
+if(MUMPS_BUILD_SINGLE)
   precision_source("s")
 endif()
-if(BUILD_DOUBLE)
+if(MUMPS_BUILD_DOUBLE)
   precision_source("d")
 endif()
-if(BUILD_COMPLEX)
+if(MUMPS_BUILD_COMPLEX)
   precision_source("c")
 endif()
-if(BUILD_COMPLEX16)
+if(MUMPS_BUILD_COMPLEX16)
   precision_source("z")
 endif()
 
