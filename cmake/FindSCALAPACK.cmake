@@ -100,6 +100,9 @@ LAPACK::LAPACK MPI::MPI_Fortran ${CMAKE_THREAD_LIBS_INIT}
 )
 # we need LAPACK::LAPACK for SCALAPACK to link for these checks
 
+
+string(MAKE_C_IDENTIFIER "${path}" _id)
+
 # determine precisions to check; if none requested, default to real64 so that at least one compile check runs
 set(_check_precisions)
 foreach(_c IN ITEMS REAL32 REAL64 COMPLEX64 COMPLEX128)
@@ -128,8 +131,12 @@ foreach(_prec _bit IN ZIP_LISTS precs bits)
     real(kind=real${_bit}) :: r
     r = p${_prec}lamch(i, 'E')
     end program"
-    SCALAPACK_REAL${_bit}_FOUND
+    SCALAPACK_REAL${_bit}_FOUND_${_id}
   )
+
+  if(SCALAPACK_REAL${_bit}_FOUND_${_id})
+    set(SCALAPACK_REAL${_bit}_FOUND true CACHE BOOL "Found SCALAPACK real${_bit}")
+  endif()
 endforeach()
 
 
@@ -153,8 +160,13 @@ foreach(_prec _bit _rk IN ZIP_LISTS precs bits kinds)
     beta = (0.0_rk, 0.0_rk)
     call p${_prec}gemm('N', 'N', 0, 0, 0, alpha, a, 1, 1, desca, b, 1, 1, descb, beta, c, 1, 1, descc)
     end program"
-    SCALAPACK_COMPLEX${_bit}_FOUND
+    SCALAPACK_COMPLEX${_bit}_FOUND_${_id}
   )
+
+  if(SCALAPACK_COMPLEX${_bit}_FOUND_${_id})
+    set(SCALAPACK_COMPLEX${_bit}_FOUND true CACHE BOOL "Found SCALAPACK complex${_bit}")
+  endif()
+
 endforeach()
 
 if(NOT (SCALAPACK_REAL32_FOUND OR SCALAPACK_REAL64_FOUND OR SCALAPACK_COMPLEX64_FOUND OR SCALAPACK_COMPLEX128_FOUND))
