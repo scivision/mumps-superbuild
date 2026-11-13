@@ -66,7 +66,7 @@ if(WIN32 AND (NOT BISON_ROOT OR NOT FLEX_ROOT))
 
   # Check if 'win_flex_bison_url' hasn't been defined by the user (with -D)
   if(NOT DEFINED win_flex_bison_url)
-    string(JSON win_flex_bison_url GET "${json}" win_flex_bison url)
+    string(JSON win_flex_bison_url GET "${json}" win_flex_bison)
   endif()
 
   FetchContent_Declare(win_flex_bison URL ${win_flex_bison_url})
@@ -117,17 +117,3 @@ if(DEFINED win_flex_bison)
 endif()
 
 FetchContent_MakeAvailable(${_winfc_dep} SCOTCH)
-
-
-if(NOT TARGET SCOTCH::scotch)
-
-set(SCOTCH_names scotch scotcherr esmumps)
-if(MUMPS_parallel)
-  list(PREPEND SCOTCH_names ptscotch ptscotcherr ptesmumps)
-endif()
-
-foreach(l IN LISTS SCOTCH_names)
-  add_library(SCOTCH::${l} ALIAS ${l})
-endforeach()
-
-endif()

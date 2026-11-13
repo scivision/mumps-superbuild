@@ -1,6 +1,6 @@
 {
   "scalapack":  "https://github.com/Reference-ScaLAPACK/scalapack/archive/684986536223624286c5532c2e069a5fa7c040f6.tar.gz",
-  "scotch": "https://github.com/scivision/scotch/archive/60b8febe6261485a94f6d8ba523d5a244a0068b4.tar.gz",
+  "scotch": "https://gitlab.inria.fr/scotch/scotch/-/archive/v7.0.17/scotch-v7.0.17.tar.bz2",
   "parmetis": "https://github.com/scivision/parmetis/archive/175ffe29d7980360a4253cbedb978873e8002bfb.tar.gz",
   "metis": "https://github.com/scivision/metis/archive/456244e99d7f0027706033d18bc1b3424d3507cc.tar.gz",
   "xkblas": "https://github.com/scivision/xkblas/archive/dbb84a2f8503609a871428bbb1da1a3361f9bd62.tar.gz",
