@@ -36,7 +36,20 @@ return(PROPAGATE BISON_ROOT)
 endfunction()
 
 
-if(APPLE)
+set(SCOTCH_COMPONENTS ESMUMPS)
+if(MUMPS_ptscotch)
+  list(APPEND SCOTCH_COMPONENTS PTScotch)
+endif()
+
+# Probe for an existing SCOTCH first, so that build tools (Bison, Flex) are only
+# obtained when SCOTCH actually needs to be built from source.
+# FetchContent_MakeAvailable(SCOTCH) repeats this find_package() via FIND_PACKAGE_ARGS,
+# which is cheap since results are cached.
+if(NOT FETCHCONTENT_TRY_FIND_PACKAGE_MODE STREQUAL "NEVER")
+  find_package(SCOTCH COMPONENTS ${SCOTCH_COMPONENTS})
+endif()
+
+if(APPLE AND NOT SCOTCH_FOUND)
   find_package(BISON 2.7)
   if(NOT BISON_FOUND)
     unset(BISON_EXECUTABLE CACHE)
@@ -62,7 +75,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE true)
 #https://gitlab.inria.fr/scotch/scotch/-/blob/master/src/CMakeLists.txt#L84
 # CMAKE_POSITION_INDEPENDENT_CODE=ON necessary on HPC with shared libs like MPI
 
-if(WIN32 AND (NOT BISON_ROOT OR NOT FLEX_ROOT))
+if(WIN32 AND NOT SCOTCH_FOUND AND (NOT BISON_ROOT OR NOT FLEX_ROOT))
 
   # Check if 'win_flex_bison_url' hasn't been defined by the user (with -D)
   if(NOT DEFINED win_flex_bison_url)
@@ -103,18 +116,9 @@ if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
   set(CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_MINIMUM_REQUIRED_VERSION})
 endif()
 
-set(SCOTCH_COMPONENTS ESMUMPS)
-if(MUMPS_ptscotch)
-  list(APPEND SCOTCH_COMPONENTS PTScotch)
-endif()
-
 FetchContent_Declare(SCOTCH
 URL ${scotch_url}
 FIND_PACKAGE_ARGS COMPONENTS ${SCOTCH_COMPONENTS}
 )
 
-if(DEFINED win_flex_bison)
-  set(_winfc_dep win_flex_bison)
-endif()
-
-FetchContent_MakeAvailable(${_winfc_dep} SCOTCH)
+FetchContent_MakeAvailable(SCOTCH)
