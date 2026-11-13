@@ -5,7 +5,7 @@ Methods of building MUMPS on Windows include:
 
 * Windows Subsystem for Linux (WSL) - GCC GFortran, LLVM Flang
 * [Intel oneAPI Fortran compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/oneapi-toolkit-download.html) with oneAPI C compiler `icx` or Visual Studio C compiler `cl`
-* MSYS2 - GCC GFortran, LLVM Flang
+* MSYS2 - GCC GFortran `pacman -S --needed - < pacman-packages.txt` from this mumps-superbuild/ directory
 
 CMake and Ninja can be installed on native Windows via WinGet:
 

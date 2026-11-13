@@ -89,18 +89,3 @@ By default GEMMT is ON if with Intel MKL and may be enabled / disabled like:
 ```sh
 cmake -DMUMPS_gemmt=off
 ```
-
-## Build LAPACK
-
-If the compiler doesn't have LAPACK and SCALAPACK, first build and install them:
-
-```sh
-cmake -S scripts -B scripts/build -DCMAKE_INSTALL_PREFIX=~/mylibs
-cmake --build scripts/build -t scalapack
-
-# mumps
-cmake -B build -DCMAKE_PREFIX_PATH=~/mylibs
-cmake --build build
-```
-
-Since oneAPI comes with LAPACK and ScaLAPACK with oneAPI in oneMKL, there is no need to build them with oneAPI + oneMKL.
