@@ -45,20 +45,18 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM" OR CMAKE_C_COMPILER_ID STREQUA
   set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE OPT_IN)
 endif()
 
-# needed for CMake < 3.29: else CMake errors.
+set(_mumps_precs SINGLE DOUBLE COMPLEX COMPLEX16)
+set(_scalapack_comps REAL32 REAL64 COMPLEX64 COMPLEX128)
 set(_scalapack_fpa)
-if(DEFINED SCALAPACK_VENDOR AND NOT SCALAPACK_VENDOR STREQUAL "")
-  set(_scalapack_fpa COMPONENTS ${SCALAPACK_VENDOR})
-endif()
+foreach(_prec _comp IN ZIP_LISTS _mumps_precs _scalapack_comps)
+  if(MUMPS_BUILD_${_prec})
+    list(APPEND _scalapack_fpa ${_comp})
+  endif()
+endforeach()
 
 FetchContent_Declare(SCALAPACK
 URL ${scalapack_url}
-FIND_PACKAGE_ARGS ${_scalapack_fpa}
-)
-
-FetchContent_Declare(SCALAPACK
-URL ${scalapack_url}
-FIND_PACKAGE_ARGS COMPONENTS ${SCALAPACK_VENDOR}
+FIND_PACKAGE_ARGS COMPONENTS ${SCALAPACK_VENDOR} ${_scalapack_fpa}
 )
 
 FetchContent_MakeAvailable(SCALAPACK)

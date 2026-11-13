@@ -18,7 +18,8 @@ COMPONENTS
 ^^^^^^^^^^
 
 ``INT64``
-  64-bit integers (default 32-bit integers is what most users want and what most libraries have)
+  64-bit integers for indexing. Note the default 32-bit integers is what most users want and what
+  most libraries have.
   Note: due to the non-interface design of Scalapack, the integer bitness isn't verified in this
   FindSCALAPACK module.
 
@@ -38,6 +39,21 @@ COMPONENTS
 ``STATIC``
   Library search default on non-Windows is shared then static. On Windows default search is static first.
   Specifying STATIC component searches for static libraries only.
+
+
+Precision components: default REAL64, can be any combination of these.
+
+``REAL32``
+  32-bit real precision (single precision)
+
+``REAL64``
+  64-bit real precision (double precision)
+
+``COMPLEX64``
+  64-bit complex precision (single precision)
+
+``COMPLEX128``
+  128-bit complex precision (double precision)
 
 Result Variables
 ^^^^^^^^^^^^^^^^
@@ -75,34 +91,46 @@ set(CMAKE_REQUIRED_INCLUDES ${SCALAPACK_INCLUDE_DIR} ${LAPACK_INCLUDE_DIRS})
 set(CMAKE_REQUIRED_LIBRARIES ${path})
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES} MPI::MPI_Fortran ${CMAKE_THREAD_LIBS_INIT})
 
-foreach(_prec IN ITEMS s d)
-  if(_prec STREQUAL "s")
-    set(_ip 32)
-  elseif(_prec STREQUAL "d")
-    set(_ip 64)
+# determine precisions to check; if none requested, default to real64 so that at least one compile check runs
+set(_check_precisions)
+foreach(_c IN ITEMS REAL32 REAL64 COMPLEX64 COMPLEX128)
+  if(${_c} IN_LIST SCALAPACK_FIND_COMPONENTS)
+    list(APPEND _check_precisions ${_c})
+  endif()
+endforeach()
+if(NOT _check_precisions)
+  set(_check_precisions REAL64)
+endif()
+
+set(precs s d)
+set(bits 32 64)
+
+foreach(_prec _bit IN ZIP_LISTS precs bits)
+  if(NOT REAL${_bit} IN_LIST _check_precisions)
+    continue()
   endif()
 
   check_source_compiles(Fortran
     "program test
     use, intrinsic :: iso_fortran_env
     implicit none
-    real(kind=real${_ip}), external :: p${_prec}lamch
+    real(kind=real${_bit}), external :: p${_prec}lamch
     integer :: i
-    print *, p${_prec}lamch(i, 'E')
+    real(kind=real${_bit}) :: r
+    r = p${_prec}lamch(i, 'E')
     end program"
-    SCALAPACK_${_prec}_FOUND
+    SCALAPACK_REAL${_bit}_FOUND
   )
-  if(SCALAPACK_${_prec}_FOUND)
-    return()
-  endif()
 endforeach()
 
 
-foreach(_prec IN ITEMS c z)
-  if(_prec STREQUAL "c")
-    set(_rk real32)
-  elseif(_prec STREQUAL "z")
-    set(_rk real64)
+set(precs c z)
+set(bits 64 128)
+set(kinds real32 real64)
+
+foreach(_prec _bit _rk IN ZIP_LISTS precs bits kinds)
+  if(NOT COMPLEX${_bit} IN_LIST _check_precisions)
+    continue()
   endif()
 
   check_source_compiles(Fortran
@@ -116,14 +144,13 @@ foreach(_prec IN ITEMS c z)
     beta = (0.0_rk, 0.0_rk)
     call p${_prec}gemm('N', 'N', 0, 0, 0, alpha, a, 1, 1, desca, b, 1, 1, descb, beta, c, 1, 1, descc)
     end program"
-    SCALAPACK_${_prec}_FOUND
+    SCALAPACK_COMPLEX${_bit}_FOUND
   )
-  if(SCALAPACK_${_prec}_FOUND)
-    return()
-  endif()
 endforeach()
 
-set(${_result} false PARENT_SCOPE)
+if(NOT (SCALAPACK_REAL32_FOUND OR SCALAPACK_REAL64_FOUND OR SCALAPACK_COMPLEX64_FOUND OR SCALAPACK_COMPLEX128_FOUND))
+  set(${_result} false PARENT_SCOPE)
+endif()
 
 endfunction()
 
@@ -173,7 +200,7 @@ set(SCALAPACK_LIBRARY $<LINK_ONLY:MKL::MKL>)
 
 set(SCALAPACK_MKL_FOUND true)
 
-foreach(c IN ITEMS TBB INT64 OpenMP)
+foreach(c IN ITEMS TBB INT64 OpenMP REAL32 REAL64 COMPLEX64 COMPLEX128)
   if(${c} IN_LIST SCALAPACK_FIND_COMPONENTS)
     set(SCALAPACK_${c}_FOUND true)
   endif()
