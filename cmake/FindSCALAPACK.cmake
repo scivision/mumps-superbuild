@@ -12,7 +12,13 @@ Finds SCALAPACK libraries for MKL, OpenMPI and MPICH.
 Intel MKL relies on having environment variable MKLROOT set, typically by sourcing
 mklvars.sh beforehand.
 
-This module does NOT find LAPACK.
+This module does NOT find LAPACK or MPI, therefore if not using MKL, the user project must first do
+
+.. code-block:: cmake
+
+  find_package(LAPACK REQUIRED)
+  find_package(MPI REQUIRED COMPONENTS Fortran)
+
 
 COMPONENTS
 ^^^^^^^^^^
@@ -88,8 +94,11 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "EXECUTABLE")
 set(CMAKE_REQUIRED_FLAGS)
 set(CMAKE_REQUIRED_LINK_OPTIONS)
 set(CMAKE_REQUIRED_INCLUDES ${SCALAPACK_INCLUDE_DIR} ${LAPACK_INCLUDE_DIRS})
-set(CMAKE_REQUIRED_LIBRARIES ${path})
-list(APPEND CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES} MPI::MPI_Fortran ${CMAKE_THREAD_LIBS_INIT})
+
+set(CMAKE_REQUIRED_LIBRARIES ${path}
+LAPACK::LAPACK MPI::MPI_Fortran ${CMAKE_THREAD_LIBS_INIT}
+)
+# we need LAPACK::LAPACK for SCALAPACK to link for these checks
 
 # determine precisions to check; if none requested, default to real64 so that at least one compile check runs
 set(_check_precisions)
