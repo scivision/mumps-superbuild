@@ -311,6 +311,9 @@ endif()
 if(MUMPS_BUILD_COMPLEX16)
   precision_source("z")
 endif()
+if(NOT (MUMPS_BUILD_SINGLE OR MUMPS_BUILD_DOUBLE OR MUMPS_BUILD_COMPLEX OR MUMPS_BUILD_COMPLEX16))
+  target_link_libraries(MUMPS INTERFACE mumps_common)
+endif()
 
 
 install(FILES
