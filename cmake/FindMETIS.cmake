@@ -13,6 +13,12 @@ Imported Targets
 
 METIS::METIS - The METIS library
 
+COMPONENTS
+----------
+
+``INT64``
+  Use 64-bit integers for indices in METIS functions (default 32-bit)
+
 Result Variables
 ^^^^^^^^^^^^^^^^
 
@@ -24,12 +30,44 @@ METIS_INCLUDE_DIRS
 
 #]=======================================================================]
 
+include(CheckSourceCompiles)
 
-find_library(METIS_LIBRARY
-NAMES metis
-PATH_SUFFIXES METIS libmetis
-DOC "METIS library"
-)
+function(metis_check _result path)
+
+set(CMAKE_REQUIRED_FLAGS)
+set(CMAKE_REQUIRED_LINK_OPTIONS)
+set(CMAKE_REQUIRED_INCLUDES ${METIS_INCLUDE_DIR})
+set(CMAKE_REQUIRED_LIBRARIES ${path})
+if(GKLIB_LIBRARY)
+  list(APPEND CMAKE_REQUIRED_LIBRARIES ${GKLIB_LIBRARY})
+endif()
+
+string(MAKE_C_IDENTIFIER "${path}" _id)
+
+check_source_compiles(C
+[=[
+#include <metis.h>
+#include <stddef.h> // for NULL
+
+int main(void) {
+  idx_t nvtxs = 1, ncon = 1, nparts = 1, objval = 0;
+  idx_t xadj[2] = {0, 0};
+  idx_t adjncy[1] = {0};
+  idx_t part[1] = {0};
+  int r = METIS_PartGraphKway(&nvtxs, &ncon, xadj, adjncy,
+                              NULL, NULL, NULL, &nparts,
+                              NULL, NULL, NULL, &objval, part);
+  return 0;
+}
+]=]
+METIS_WORKS_${_id})
+
+if(NOT METIS_WORKS_${_id})
+  set(${_result} FALSE PARENT_SCOPE)
+endif()
+
+endfunction()
+
 
 # METIS >= 5.2 keeps GKlib as a separate library, so an installed METIS needs it too or the
 # gk_* symbols stay unresolved. Some packagings bundle GKlib into libmetis -- among them the
@@ -46,9 +84,27 @@ PATH_SUFFIXES METIS
 DOC "METIS include directory"
 )
 
+set(_metis_names metis)
+if(INT64 IN_LIST METIS_FIND_COMPONENTS)
+  list(PREPEND _metis_names metis64)
+endif()
+
+find_library(METIS_LIBRARY
+NAMES ${_metis_names}
+PATH_SUFFIXES METIS libmetis
+DOC "METIS library"
+VALIDATOR metis_check
+)
+
+if(METIS_LIBRARY AND INT64 IN_LIST METIS_FIND_COMPONENTS)
+  set(METIS_INT64_FOUND true)
+endif()
+
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(METIS
 REQUIRED_VARS METIS_LIBRARY METIS_INCLUDE_DIR
+HANDLE_COMPONENTS
 )
 
 if(METIS_FOUND)
