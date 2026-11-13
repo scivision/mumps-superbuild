@@ -43,8 +43,6 @@
 # See the License for more information.
 #=============================================================================
 
-set(SCOTCH_LIBRARIES)
-
 set(scotch_h scotch.h)
 if(PTScotch IN_LIST SCOTCH_FIND_COMPONENTS)
   string(PREPEND scotch_h pt)
@@ -58,28 +56,54 @@ DOC "Scotch include directory"
 # PATH_SUFFIXES scotch
 # for Ubuntu, Debian, RHEL, ...
 
+set(SCOTCH_LIBRARIES)
 # need plain scotch when using ptscotch
-set(scotch_names scotch scotcherr)
-if(ESMUMPS IN_LIST SCOTCH_FIND_COMPONENTS)
-  list(PREPEND scotch_names esmumps)
+if(PTScotch IN_LIST SCOTCH_FIND_COMPONENTS)
+  find_library(SCOTCH_ptscotch_LIBRARY
+  NAMES ptscotch
+  DOC "Parallel Scotch library"
+  )
+  list(APPEND SCOTCH_LIBRARIES ${SCOTCH_ptscotch_LIBRARY})
 endif()
+
+find_library(SCOTCH_scotch_LIBRARY
+NAMES scotch
+DOC "Scotch library"
+)
+list(APPEND SCOTCH_LIBRARIES ${SCOTCH_scotch_LIBRARY})
+
 
 if(PTScotch IN_LIST SCOTCH_FIND_COMPONENTS)
-  list(PREPEND scotch_names ptscotch ptscotcherr)
-  if(ESMUMPS IN_LIST SCOTCH_FIND_COMPONENTS)
-    list(PREPEND scotch_names ptesmumps)
-  endif()
+  find_library(SCOTCH_ptscotcherr_LIBRARY
+  NAMES ptscotcherr
+  DOC "Scotch PTScotchErr library"
+  )
+  list(APPEND SCOTCH_LIBRARIES ${SCOTCH_ptscotcherr_LIBRARY})
 endif()
 
-foreach(l IN LISTS scotch_names)
-  find_library(SCOTCH_${l}_LIBRARY
-  NAMES ${l}
-  DOC "Scotch library"
-  )
+find_library(SCOTCH_scotcherr_LIBRARY
+NAMES scotcherr
+DOC "Scotch ScotchErr library"
+)
+list(APPEND SCOTCH_LIBRARIES ${SCOTCH_scotcherr_LIBRARY})
 
-  list(APPEND SCOTCH_LIBRARIES ${SCOTCH_${l}_LIBRARY})
-  mark_as_advanced(SCOTCH_${l}_LIBRARY)
-endforeach()
+
+if(ESMUMPS IN_LIST SCOTCH_FIND_COMPONENTS)
+  if(PTScotch IN_LIST SCOTCH_FIND_COMPONENTS)
+    find_library(SCOTCH_ptesmumps_LIBRARY
+    NAMES ptesmumps
+    DOC "Scotch PTESMUMPS library"
+    )
+    list(APPEND SCOTCH_LIBRARIES ${SCOTCH_ptesmumps_LIBRARY})
+  endif()
+
+  find_library(SCOTCH_esmumps_LIBRARY
+  NAMES esmumps
+  DOC "Scotch ESMUMPS library"
+  )
+  list(APPEND SCOTCH_LIBRARIES ${SCOTCH_esmumps_LIBRARY})
+endif()
+
 
 if(PTScotch IN_LIST SCOTCH_FIND_COMPONENTS)
   if(SCOTCH_ptesmumps_LIBRARY AND SCOTCH_ptscotch_LIBRARY)
@@ -99,14 +123,15 @@ HANDLE_COMPONENTS
 if(SCOTCH_FOUND)
   set(SCOTCH_INCLUDE_DIRS ${SCOTCH_INCLUDE_DIR})
 
-  message(DEBUG "Scotch libraries: ${SCOTCH_LIBRARIES}
-  Scotch include directories: ${SCOTCH_INCLUDE_DIRS}")
+  message(DEBUG "Scotch libraries: ${SCOTCH_LIBRARIES}")
+  message(DEBUG "Scotch include directories: ${SCOTCH_INCLUDE_DIRS}")
 
-  foreach(l IN LISTS scotch_names)
-    if(NOT TARGET SCOTCH::${l})
+  foreach(l IN ITEMS scotcherr ptscotcherr scotch ptscotch esmumps ptesmumps)
+    if(SCOTCH_${l}_LIBRARY AND NOT TARGET SCOTCH::${l})
       add_library(SCOTCH::${l} INTERFACE IMPORTED)
       set_property(TARGET SCOTCH::${l} PROPERTY INTERFACE_LINK_LIBRARIES "${SCOTCH_${l}_LIBRARY}")
       set_property(TARGET SCOTCH::${l} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${SCOTCH_INCLUDE_DIR}")
+      mark_as_advanced(${SCOTCH_${l}_LIBRARY})
     endif()
   endforeach()
 endif()

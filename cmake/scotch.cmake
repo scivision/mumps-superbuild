@@ -91,16 +91,17 @@ if(WIN32 AND (NOT BISON_ROOT OR NOT FLEX_ROOT))
 endif()
 
 
-if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
-  set(CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_MINIMUM_REQUIRED_VERSION})
-endif()
-
 # Check if 'scotch_url' hasn't been defined by the user (with -D)
 if(NOT DEFINED scotch_url)
   string(JSON scotch_url GET "${json}" "scotch")
 endif()
 
-message(STATUS "BISON_ROOT ${BISON_ROOT}  FLEX_ROOT ${FLEX_ROOT}")
+message(DEBUG "Hints to Scotch: BISON_ROOT ${BISON_ROOT}  FLEX_ROOT ${FLEX_ROOT}")
+
+# need this here to set expected policies like CMP0077 in Scotch
+if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
+  set(CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_MINIMUM_REQUIRED_VERSION})
+endif()
 
 set(SCOTCH_COMPONENTS ESMUMPS)
 if(MUMPS_ptscotch)

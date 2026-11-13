@@ -252,7 +252,7 @@ set(ORDERING_DEFS pord)
 if(MUMPS_scotch)
   include(cmake/scotch.cmake)
 
-  list(APPEND ORDERING_DEFS scotch $<$<BOOL:${MUMPS_parallel}>:ptscotch>)
+  list(APPEND ORDERING_DEFS scotch $<$<BOOL:${MUMPS_ptscotch}>:ptscotch>)
 endif()
 
 # --- METIS / ParMETIS ordering definitions
