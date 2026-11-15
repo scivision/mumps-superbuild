@@ -82,7 +82,15 @@ endif()
 
 get_property(test_names DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
 
-set_property(TEST ${test_names} PROPERTY RESOURCE_LOCK cpu_mpi)
+if(MUMPS_parallel AND NOT MPIEXEC_EXECUTABLE)
+# this is a corner case, for example Windows MSYS2 with ARM64 CPU
+  foreach(t IN LISTS test_names)
+    get_property(label TEST ${t} PROPERTY LABELS)
+    if("mpi" IN_LIST label)
+      set_property(TEST ${t} PROPERTY DISABLED true)
+    endif()
+  endforeach()
+endif()
 
 if(BUILD_SHARED_LIBS)
   if(WIN32)

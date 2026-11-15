@@ -20,4 +20,9 @@ if(DEFINED mpi_tmpdir)
   set_property(TEST ${test} PROPERTY ENVIRONMENT "TMPDIR=${mpi_tmpdir}")
 endif()
 
+set_tests_properties(${test} PROPERTIES
+LABELS "mpi"
+RESOURCE_LOCK cpu_mpi
+)
+
 endfunction()
