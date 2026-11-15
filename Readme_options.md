@@ -82,7 +82,7 @@ The MUMPS version defaults to a recent release.
 For reproducibility, benchmarking and other purposes, one may select the version of MUMPS to build like:
 
 ```sh
-cmake -B build -DMUMPS_UPSTREAM_VERSION=5.9.1
+cmake -B build -DMUMPS_UPSTREAM_VERSION=5.9.2
 ```
 
 The source URL may be directly specified, which may be a local file or remote URL:
