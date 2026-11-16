@@ -49,6 +49,11 @@ COMPONENTS
 ``LAPACKE``
   LapackE C / C++ interface
 
+``ArmPL``
+  Arm Performance Libraries (AArch64 Linux, macOS), BLAS and LAPACK in one library.
+  Found under ``ARMPL_ROOT`` or the ``ARMPL_DIR`` environment variable Arm's scripts set.
+  Add ``OpenMP`` for the threaded (``_mp``) build and ``INT64`` for ILP64.
+
 ``Netlib``
   Netlib Lapack for Fortran
 ``OpenBLAS``
@@ -97,6 +102,7 @@ include(CheckSourceCompiles)
 
 set(LAPACK_LIBRARIES)
 set(LAPACK_INCLUDE_DIRS)
+set(_lapack_link_extra)
 
 # ===== functions ==========
 
@@ -111,12 +117,14 @@ endif()
 # candidate library. Otherwise the first candidate that fails to link -- a static library
 # needing extra link libraries, say -- caches a negative result, and the test is then skipped
 # for every later candidate, rejecting libraries that do work.
-string(MAKE_C_IDENTIFIER "${path}" _id)
+string(MAKE_C_IDENTIFIER "${path}${_lapack_link_extra}" _id)
 
 set(CMAKE_REQUIRED_FLAGS)
 set(CMAKE_REQUIRED_LINK_OPTIONS)
 set(CMAKE_REQUIRED_INCLUDES)
-set(CMAKE_REQUIRED_LIBRARIES ${path})
+# _lapack_link_extra: anything a vendor finder knows its library needs at link time but doesn't
+# record itself (e.g. the OpenMP runtime for ArmPL's _mp build). Empty for the others.
+set(CMAKE_REQUIRED_LIBRARIES ${path} ${_lapack_link_extra})
 
 check_source_compiles(Fortran
 "program test
@@ -304,6 +312,71 @@ if(LAPACK_LIBRARY AND LAPACK_INCLUDE_DIR)
 
   set(LAPACK_LIBRARIES ${LAPACK_LIBRARY} PARENT_SCOPE)
   set(LAPACK_INCLUDE_DIRS ${LAPACK_INCLUDE_DIR} PARENT_SCOPE)
+endif()
+
+endfunction()
+
+
+#===============================
+function(lapack_armpl)
+
+# Arm Performance Libraries: one library carries BLAS and LAPACK, in four variants named
+# armpl_{lp64,ilp64}[_mp], where _mp is the OpenMP build. The install root is what Arm's
+# environment scripts and modulefiles export as ARMPL_DIR.
+
+set(_int lp64)
+if(INT64 IN_LIST LAPACK_FIND_COMPONENTS)
+  set(_int ilp64)
+endif()
+
+set(_names armpl_${_int})
+set(_lapack_link_extra)
+if(OpenMP IN_LIST LAPACK_FIND_COMPONENTS)
+  set(_names armpl_${_int}_mp)
+  # The _mp library doesn't record a dependency on an OpenMP runtime (Arm's own
+  # armpl-*-omp.pc links it with -fopenmp), so the link check and consumers need one.
+  find_package(OpenMP COMPONENTS C Fortran)
+  if(TARGET OpenMP::OpenMP_Fortran)
+    set(_lapack_link_extra OpenMP::OpenMP_Fortran)
+  elseif(TARGET OpenMP::OpenMP_C)
+    set(_lapack_link_extra OpenMP::OpenMP_C)
+  else()
+    message(WARNING "LAPACK_VENDOR=ArmPL;OpenMP needs an OpenMP runtime, and none was found")
+    return()
+  endif()
+endif()
+
+find_library(LAPACK_LIBRARY
+NAMES ${_names}
+NAMES_PER_DIR
+HINTS ${ARMPL_ROOT} ENV ARMPL_ROOT ENV ARMPL_DIR
+PATH_SUFFIXES lib
+DOC "Arm Performance Libraries (BLAS + LAPACK)"
+VALIDATOR lapack_check
+)
+
+cmake_path(GET LAPACK_LIBRARY PARENT_PATH _armpl_root)
+cmake_path(GET _armpl_root PARENT_PATH _armpl_root)
+
+find_path(LAPACK_INCLUDE_DIR
+NAMES armpl.h
+HINTS ${_armpl_root} ${ARMPL_ROOT} ENV ARMPL_ROOT ENV ARMPL_DIR
+PATH_SUFFIXES include
+DOC "Arm Performance Libraries include directory"
+)
+
+if(LAPACK_LIBRARY AND LAPACK_INCLUDE_DIR)
+  set(LAPACK_ArmPL_FOUND true PARENT_SCOPE)
+  if(INT64 IN_LIST LAPACK_FIND_COMPONENTS)
+    set(LAPACK_INT64_FOUND true PARENT_SCOPE)
+  endif()
+  if(OpenMP IN_LIST LAPACK_FIND_COMPONENTS)
+    set(LAPACK_OpenMP_FOUND true PARENT_SCOPE)
+  endif()
+
+  set(LAPACK_LIBRARIES ${LAPACK_LIBRARY} ${_lapack_link_extra} PARENT_SCOPE)
+  set(LAPACK_INCLUDE_DIRS ${LAPACK_INCLUDE_DIR} PARENT_SCOPE)
+  set(_lapack_link_extra ${_lapack_link_extra} PARENT_SCOPE)
 endif()
 
 endfunction()
@@ -517,6 +590,8 @@ elseif(OpenBLAS IN_LIST LAPACK_FIND_COMPONENTS)
   lapack_openblas()
 elseif(AOCL IN_LIST LAPACK_FIND_COMPONENTS)
   lapack_aocl()
+elseif(ArmPL IN_LIST LAPACK_FIND_COMPONENTS)
+  lapack_armpl()
 elseif(Accelerate IN_LIST LAPACK_FIND_COMPONENTS)
   lapack_accelerate()
 elseif(LAPACK_CRAY)
@@ -547,7 +622,7 @@ end program
   try_run(_lapack_run_ver _lapack_build_ver
     SOURCE_FROM_VAR main.f90 _lapack_vers_src
     RUN_OUTPUT_STDOUT_VARIABLE _lapack_version
-    LINK_LIBRARIES ${LAPACK_LIBRARY}
+    LINK_LIBRARIES ${LAPACK_LIBRARY} ${_lapack_link_extra}
   )
   if(_lapack_run_ver EQUAL 0 AND _lapack_build_ver)
     string(STRIP "${_lapack_version}" _lapack_version)
