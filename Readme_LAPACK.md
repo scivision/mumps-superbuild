@@ -6,6 +6,7 @@ By default, the generic LAPACK library "lapack" is searched for.
 To specify a particular LAPACK library, use CMake configure variable "LAPACK_VENDOR" and "SCALAPACK_VENDOR" using one of the following vendors:
 
 * AOCL  [AMD Optimizing CPU Libraries](https://www.amd.com/en/developer/aocl.html)
+* ArmPL [Arm Performance Libraries](https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries): AArch64, e.g. AWS Graviton. Set `ARMPL_DIR` (Arm's environment scripts do) or `-DARMPL_ROOT`, and use `-DLAPACK_VENDOR="ArmPL;OpenMP"` for the threaded library
 * Atlas [Automatically Tuned Linear Algebra Software](https://math-atlas.sourceforge.net/)
 * MKL  [Intel oneMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html): requires [oneMKL >= 2021.3](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2023-2/cmake-config-for-onemkl.html)
 * Accelerate [Apple Accelerate](https://developer.apple.com/accelerate/) (macOS only)
