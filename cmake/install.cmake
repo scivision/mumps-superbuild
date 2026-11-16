@@ -23,6 +23,9 @@ ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
 DESTINATION cmake
 )
 
+# pkg-config files for non-CMake consumers
+include(${CMAKE_CURRENT_LIST_DIR}/pkgconfig.cmake)
+
 # don't do this for now, as it breaks FetchContent targets
 # if(CMAKE_VERSION VERSION_GREATER_EQUAL "4.3")
 #   install(PACKAGE_INFO ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets)

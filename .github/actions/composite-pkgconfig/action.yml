@@ -1,0 +1,28 @@
+name: pkg-config consumer
+description: Link the C example using only pkg-config output, checking the installed .pc files
+
+inputs:
+  prefix:
+    description: install prefix holding lib/pkgconfig
+    required: false
+    default: build/local
+  cc:
+    description: C compiler, mpicc for a parallel MUMPS
+    required: false
+    default: cc
+
+runs:
+  using: composite
+
+  steps:
+
+  - name: link example with pkg-config
+    shell: bash
+    run: |
+      set -e
+      prefix=$(cd "${{ inputs.prefix }}" && pwd)
+      export PKG_CONFIG_PATH="$prefix/lib/pkgconfig"
+      pkg-config --print-errors --exists dmumps
+      echo "static link line:"
+      pkg-config --static --libs dmumps
+      ${{ inputs.cc }} example/d_example.c $(pkg-config --cflags --static --libs dmumps) -o pkgconfig_consumer
