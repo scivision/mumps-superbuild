@@ -115,6 +115,10 @@ message(DEBUG "Hints to Scotch: BISON_ROOT ${BISON_ROOT}  FLEX_ROOT ${FLEX_ROOT}
 if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
   set(CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_MINIMUM_REQUIRED_VERSION})
 endif()
+# CMAKE_POLICY_VERSION_MINIMUM only exists from CMake 4.0. Before that Scotch's option() calls
+# clear the variables set above (BUILD_PTSCOTCH among them), so a sequential build would still
+# go looking for MPI.
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 FetchContent_Declare(SCOTCH
 URL ${scotch_url}
