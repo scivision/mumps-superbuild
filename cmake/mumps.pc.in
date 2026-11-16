@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: @_pc_name@
+Description: @_pc_description@
+URL: https://mumps-solver.org/
+Version: @MUMPS_ACTUAL_VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} @_pc_libs@
+Libs.private: @_pc_libs_private@
