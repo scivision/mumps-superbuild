@@ -200,6 +200,10 @@ jobs:
     strategy:
       matrix:
         cmake_version: ["3.26.6"]
+        # nompi-scotch is the CMP0077 regression test. On CMake older than 4 Scotch's option()
+        # calls used to clear BUILD_PTSCOTCH, so a sequential build went looking for MPI that
+        # this job deliberately does not install (composite-deps skips MPI for a "nompi" preset).
+        preset: [default, nompi-scotch]
 
     steps:
     - *checkout
@@ -208,7 +212,7 @@ jobs:
     - uses: ./.github/actions/composite-cmake
 
     - name: configure
-      run: $CMAKE --workflow --preset default
+      run: $CMAKE --workflow --preset ${{ matrix.preset }}
 # syntax needed for older CMake
 
     - name: install package
