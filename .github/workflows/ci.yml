@@ -109,6 +109,57 @@ jobs:
       uses: ./.github/actions/composite-pkgconfig
 
 
+  armpl:
+    # ArmPL is the vendor BLAS/LAPACK on AArch64 (it's what AWS points to for Graviton).
+    # openmp-nompi covers the threaded "_mp" library, which needs an OpenMP runtime added
+    # because the library doesn't record that dependency itself.
+    # This is also the only Linux ARM64 job, the rest of ARM coverage is macOS.
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - preset: nompi
+          vendor: ArmPL
+        - preset: openmp-nompi
+          vendor: ArmPL;OpenMP
+
+    name: ubuntu-24.04-arm-ArmPL-${{ matrix.preset }}
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+    - *checkout
+
+    - name: install ArmPL
+      # Arm's apt repository, so there is no tarball installer or login to drive.
+      # The install root is taken from the package file list rather than a guessed path.
+      run: |
+        curl -LO https://developer.arm.com/packages/arm-toolchains/ubuntu/pool/arm-toolchains-repository_2-2~noble_all.deb
+        sudo dpkg -i arm-toolchains-repository_2-2~noble_all.deb
+        sudo apt update
+        sudo apt install -y arm-performance-libraries
+        lib=$(dpkg -L arm-performance-libraries | grep -m1 -E '/libarmpl_lp64\.so$')
+        if [ -z "$lib" ]; then
+          echo "libarmpl_lp64.so not found in the package, its .so files are:"
+          dpkg -L arm-performance-libraries | grep -E '\.so$' | head -20
+          exit 1
+        fi
+        root=$(dirname "$(dirname "$lib")")
+        echo "ArmPL root: $root"
+        echo "ARMPL_DIR=$root" >> $GITHUB_ENV
+
+    - name: configure
+      run: cmake --preset ${{ matrix.preset }} -DLAPACK_VENDOR="${{ matrix.vendor }}"
+
+    - run: cmake --workflow ${{ matrix.preset }}
+
+    - run: cmake --install build
+
+    - name: pkg-config consumer
+      uses: ./.github/actions/composite-pkgconfig
+
+
   gnu-make:
     # this is important case as due to project complexity, some failures only happen with GNU Make (or Ninja)
     timeout-minutes: 7
