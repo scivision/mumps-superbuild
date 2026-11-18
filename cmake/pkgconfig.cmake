@@ -111,8 +111,12 @@ endif()
 
 if(MUMPS_parallel)
   set(_pc_flavor "parallel")
+  set(_pc_cflags "-I\${includedir}")
 else()
   set(_pc_flavor "sequential")
+  # libseq installs its phony mpi.h under include/mumps_seq/ so that it can't shadow a real MPI
+  # header. Consumers still have to reach it, since the MUMPS C headers include mpi.h.
+  set(_pc_cflags "-I\${includedir} -I\${includedir}/mumps_seq")
 endif()
 
 set(_pc_files)

@@ -6,7 +6,7 @@ mumps_get_src(mpiseq_c_sources mpiseq c)
 add_library(mpiseq_c ${mpiseq_c_sources})
 target_include_directories(mpiseq_c PUBLIC
 "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/mumps_seq/>
 )
 target_compile_options(mpiseq_c PRIVATE ${mumps_cflags})
 target_compile_definitions(mpiseq_c PRIVATE ${mumps_cdefs})

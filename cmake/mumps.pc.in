@@ -6,6 +6,6 @@ Name: @_pc_name@
 Description: @_pc_description@
 URL: https://mumps-solver.org/
 Version: @MUMPS_ACTUAL_VERSION@
-Cflags: -I${includedir}
+Cflags: @_pc_cflags@
 Libs: -L${libdir} @_pc_libs@
 Libs.private: @_pc_libs_private@
