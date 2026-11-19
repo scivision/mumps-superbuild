@@ -11,7 +11,6 @@ $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/mumps_seq/>
 target_compile_options(mpiseq_c PRIVATE ${mumps_cflags})
 target_compile_definitions(mpiseq_c PRIVATE ${mumps_cdefs})
 
-
 mumps_get_src(mpiseq_fortran_sources mpiseq fortran)
 
 add_library(mpiseq_fortran ${mpiseq_fortran_sources} $<TARGET_OBJECTS:mpiseq_c>)
@@ -36,6 +35,10 @@ EXPORT_NAME MPISEQ
 LIBRARY_OUTPUT_DIRECTORY ${MUMPS_BINARY_DIR}/lib
 ARCHIVE_OUTPUT_DIRECTORY ${MUMPS_BINARY_DIR}/lib
 )
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.1)
+  set_target_properties(mpiseq mpiseq_c mpiseq_fortran PROPERTIES SPDX_LICENSE "CECILL-C")
+endif()
 
 install(TARGETS mpiseq mpiseq_c mpiseq_fortran EXPORT ${PROJECT_NAME}-targets)
 

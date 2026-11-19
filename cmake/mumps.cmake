@@ -123,6 +123,10 @@ target_link_options(mumps_common PRIVATE
   "$<$<BOOL:${MSVC}>:/LIBPATH:${CMAKE_Fortran_IMPLICIT_LINK_DIRECTORIES}>"
 )
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.1)
+  set_target_properties(mumps_common mumps_common_C mumps_common_Fortran PROPERTIES SPDX_LICENSE "CECILL-C")
+endif()
+
 foreach(t IN ITEMS mumps_common mumps_common_C mumps_common_Fortran)
   target_include_directories(${t} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_SOURCE_DIR}/../include>"
@@ -239,6 +243,10 @@ target_compile_definitions(${a}mumps_Fortran PRIVATE ${ORDERING_DEFS} ${mumps_fd
 target_compile_options(${a}mumps_Fortran PRIVATE ${mumps_fflags})
 
 add_library(${a}mumps $<TARGET_OBJECTS:${a}mumps_C> $<TARGET_OBJECTS:${a}mumps_Fortran>)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.1)
+  set_target_properties(${a}mumps ${a}mumps_C ${a}mumps_Fortran PROPERTIES SPDX_LICENSE "CECILL-C")
+endif()
 
 if(WIN32 AND BUILD_SHARED_LIBS)
   # Automatic DLL exports cannot make Fortran module data consumable without

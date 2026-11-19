@@ -31,6 +31,10 @@ include(${CMAKE_CURRENT_LIST_DIR}/pkgconfig.cmake)
 #   install(PACKAGE_INFO ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-targets)
 # endif()
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.5)
+  install(SBOM ${PROJECT_NAME} EXPORTS ${PROJECT_NAME}-targets)
+endif()
+
 # --- CPack
 
 set(CPACK_GENERATOR "TBZ2")

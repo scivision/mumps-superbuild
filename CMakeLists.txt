@@ -70,9 +70,16 @@ if(MUMPS_ACTUAL_VERSION VERSION_LESS 5.2)
   message(FATAL_ERROR "MUMPS version ${MUMPS_ACTUAL_VERSION} is too old, please use MUMPS >= 5.2")
 endif()
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.3)
+  # https://spdx.github.io/spdx-spec/v3.0.1/annexes/spdx-license-expressions/
+  # the MUMPS code is CECILL-C, but the CMake script is MIT
+  set(_mumps_spdx_license SPDX_LICENSE "MIT AND CECILL-C")
+endif()
+
 project(MUMPS
 LANGUAGES C Fortran
 VERSION ${MUMPS_PROJECT_VERSION}
+${_mumps_spdx_license}
 DESCRIPTION "Sparse direct parallel solver"
 HOMEPAGE_URL "https://mumps-solver.org/"
 )
@@ -101,6 +108,9 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
     # OBJECT builds omp_lib.mod, but INTERFACE does not.
     add_library(mumps_dummy_openmp OBJECT src/dummy_openmp.f90)
     set_property(TARGET mumps_dummy_openmp PROPERTY Fortran_MODULE_DIRECTORY ${MUMPS_Fortran_MODULE_DIRECTORY})
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.1)
+      set_property(TARGET mumps_dummy_openmp PROPERTY SPDX_LICENSE "MIT")
+    endif()
     target_include_directories(mumps_dummy_openmp INTERFACE ${MUMPS_Fortran_MODULE_DIRECTORY})
   endif()
 endif()
