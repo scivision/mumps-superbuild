@@ -59,7 +59,7 @@ endif()
 
 
 # https://gitlab.inria.fr/scotch/scotch/-/blob/master/CMakeLists.txt
-# options were checked with Scotch 7.0.7
+# options were checked with Scotch 7.0.16
 set(ENABLE_TESTS false)
 set(INSTALL_METIS_HEADERS false)
 set(BUILD_LIBSCOTCHMETIS false)
@@ -111,13 +111,10 @@ endif()
 
 message(DEBUG "Hints to Scotch: BISON_ROOT ${BISON_ROOT}  FLEX_ROOT ${FLEX_ROOT}")
 
-# need this here to set expected policies like CMP0077 in Scotch
-if(NOT DEFINED CMAKE_POLICY_VERSION_MINIMUM)
-  set(CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_MINIMUM_REQUIRED_VERSION})
-endif()
-# CMAKE_POLICY_VERSION_MINIMUM only exists from CMake 4.0. Before that Scotch's option() calls
-# clear the variables set above (BUILD_PTSCOTCH among them), so a sequential build would still
-# go looking for MPI.
+
+block(SCOPE_FOR POLICIES)
+# Scotch's option() clears the variables set above (BUILD_PTSCOTCH among them),
+# so a sequential build would still go looking for MPI.
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 FetchContent_Declare(SCOTCH
@@ -126,3 +123,5 @@ FIND_PACKAGE_ARGS COMPONENTS ${SCOTCH_COMPONENTS}
 )
 
 FetchContent_MakeAvailable(SCOTCH)
+
+endblock()
