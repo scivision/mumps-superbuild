@@ -3,7 +3,7 @@
 Matlab MEX interface may be built:
 
 ```sh
-cmake -Dmatlab=on
+cmake -DMUMPS_matlab=on
 ```
 
 Matlab require `-DMUMPS_parallel=off`.
