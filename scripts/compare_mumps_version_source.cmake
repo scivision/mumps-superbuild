@@ -25,9 +25,21 @@ endif()
 # --- download MUMPS sources
 include(FetchContent)
 
-FetchContent_Populate(src_old URL ${old_url})
+set(compare_dir "${CMAKE_CURRENT_LIST_DIR}/../compare")
+file(MAKE_DIRECTORY "${compare_dir}")
+file(REAL_PATH "${compare_dir}" compare_dir)
 
-FetchContent_Populate(src_new URL ${new_url})
+set(old_name MUMPS_${old})
+set(new_name MUMPS_${new})
+
+set(old_dir ${compare_dir}/${old_name})
+set(new_dir ${compare_dir}/${new_name})
+
+FetchContent_Populate(MUMPS_${old} URL ${old_url}
+SOURCE_DIR "${old_dir}")
+
+FetchContent_Populate(MUMPS_${new} URL ${new_url}
+SOURCE_DIR "${new_dir}")
 
 # --- diffing
 
@@ -35,15 +47,15 @@ find_package(Python COMPONENTS Interpreter)
 
 if(Python_Interpreter_FOUND)
 
-  file(GLOB_RECURSE files LIST_DIRECTORIES false RELATIVE "${src_new_SOURCE_DIR}"
-    "${src_new_SOURCE_DIR}/${glob}")
+  file(GLOB_RECURSE files LIST_DIRECTORIES false RELATIVE "${new_dir}"
+    "${new_dir}/${glob}")
 
   message(STATUS "Comparing source files ${files} using Python difflib")
 
   foreach(file IN LISTS files)
     execute_process(
         COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/diff_print.py --ignore-comments
-          ${src_old_SOURCE_DIR}/${file} ${src_new_SOURCE_DIR}/${file}
+          ${old_dir}/${file} ${new_dir}/${file}
         COMMAND_ERROR_IS_FATAL ANY
     )
   endforeach()
@@ -69,4 +81,4 @@ if(WIN32)
 else()
   set(pager "less -R")
 endif()
-message(STATUS "   ${difft} --ignore-comments --color=always ${src_old_SOURCE_DIR} ${src_new_SOURCE_DIR} | ${pager}")
+message(STATUS "   ${difft} --ignore-comments --color=always ${old_dir} ${new_dir} | ${pager}")
