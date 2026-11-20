@@ -5,7 +5,7 @@
 [![ci_build](https://github.com/scivision/mumps-superbuild/actions/workflows/ci_build.yml/badge.svg)](https://github.com/scivision/mumps-superbuild/actions/workflows/ci_build.yml)
 [![oneapi-linux](https://github.com/scivision/mumps-superbuild/actions/workflows/oneapi-linux.yml/badge.svg)](https://github.com/scivision/mumps-superbuild/actions/workflows/oneapi-linux.yml)
 
-MUMPS is a Fortran library by the
+MUMPS is a CeCILL-C licensed Fortran library by the
 MUMPS Technologies team co-founded by Jean-Yves L'Excellent from Graal / ROMA.
 MUMPS has optional C interfaces for MPI and/or OpenMP parallel
 (or serial `cmake --workflow nompi`) solving of sparse linear systems of equations.
@@ -13,17 +13,21 @@ Once MUMPS has been built / packaged, a consuming project doesn't have to have a
 
 This repository provides a CMake superbuild project using CMake's built-in
 [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html)
-module for MUMPS and optional MUMPS dependencies including ScaLAPACK, ParMETIS, and Scotch.
+module for MUMPS and optional MUMPS dependencies including ScaLAPACK, ParMETIS / METIS, and/or PTScotch / Scotch.
 This CMake superbuild downloads the unmodified source tarfile from mumps-solver.org and builds.
+Broad compiler support is provided, including GCC, LLVM Clang/Flang, Intel oneAPI, Visual Studio, NVHPC, AOCC, Cray, and CUDA.
 
 Optional support for CUDA GPA and xKBLAS GPU-accelerated BLAS is
 [available](./Readme_options.md).
 
-CMake builds MUMPS quickly and more conveniently than the original Makefiles. CMake allows easy reuse of MUMPS in external projects via any of:
+CMake builds MUMPS quickly and more conveniently than the original Makefiles.
+CMake allows easy reuse of MUMPS in external projects via any of:
 
 * CMake [FetchContent](https://gist.github.com/scivision/2ad002ed26589783f1522160da4d27d1)
-* build MUMPS, `cmake --install`, then [find_package(MUMPS CONFIG REQUIRED)](https://gist.github.com/scivision/1ea2d19011c165b39b15ccb95d54f451)
+* CMake [find_package(MUMPS CONFIG REQUIRED)](https://gist.github.com/scivision/1ea2d19011c165b39b15ccb95d54f451)
 * CMake ExternalProject_Add (similar to FetchContent example)
+* Meson subproject
+* PkgConfig + GNU Make
 
 [MUMPS CeCILL-C license](https://mumps-solver.org/index.php?page=dwnld#license)
 is distinct from this CMake superbuild license.
