@@ -1,5 +1,9 @@
 # Used by MUMPS devs to compare MUMPS source versions
 #  option: -Dglob="Makefile" to only compare Makefiles or other file(GLOB) patterns
+#
+# Note that difftastic doesn't yet recognize Fortran fixed-form comments, but the comparison is still valid
+# https://github.com/stadelmanma/tree-sitter-fortran/issues/6
+# https://github.com/stadelmanma/tree-sitter-fixed-form-fortran/pull/2
 
 cmake_minimum_required(VERSION 3.25)
 
@@ -45,10 +49,24 @@ if(Python_Interpreter_FOUND)
   endforeach()
 endif()
 
-find_program(meld
-NAMES meld Meld
-PATHS "$ENV{ProgramFiles}/Meld"
-)
+find_program(difft NAMES difftastic difft)
 
-message(STATUS "To compare via Meld (or use other diff program):
-   ${meld} ${src_old_SOURCE_DIR} ${src_new_SOURCE_DIR}")
+if(NOT difft)
+  message(STATUS "Obtain difftastic source comparison program by")
+  if(WIN32)
+    message(STATUS "winget install --id=Wilfred.difftastic -e")
+    message(STATUS "However, to use 'less -R' it's easier to use WSL with   snap install difftastic")
+  elseif(APPLE)
+    message(STATUS "brew install difftastic")
+  else()
+    message(STATUS "snap install difftastic   (or use distro's package manager)")
+  endif()
+endif()
+
+message(STATUS "To compare directories")
+if(WIN32)
+  set(pager "more")
+else()
+  set(pager "less -R")
+endif()
+message(STATUS "   ${difft} --ignore-comments --color=always ${src_old_SOURCE_DIR} ${src_new_SOURCE_DIR} | ${pager}")
