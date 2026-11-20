@@ -16,6 +16,7 @@ file(REAL_PATH "${topdir}" topdir)
 if(NOT DEFINED cache OR cache STREQUAL "")
   set(cache ${topdir}/cache)
 endif()
+file(MAKE_DIRECTORY "${cache}")
 file(REAL_PATH "${cache}" cache)
 
 set(json_fn ${topdir}/cmake/source.json)
@@ -33,7 +34,7 @@ if(NOT DEFINED version OR version STREQUAL "")
   endforeach()
 
   list(SORT mumps_versions COMPARE NATURAL ORDER ASCENDING)
-  list(GET mumps_versions ${_last_version_idx} newest_mumps_version)
+  list(GET mumps_versions -1 newest_mumps_version)
 
   set(version "${newest_mumps_version}")
 endif()
