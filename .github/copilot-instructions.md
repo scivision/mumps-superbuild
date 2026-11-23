@@ -7,3 +7,5 @@ applyTo: '**/*.cmake, **/CMakeLists.txt, **/CMakePresets.json, **/*.cpp, **/*.h,
 * only build the project code: `cmake --workflow build`
 
 * On Windows, suggest using WSL (Windows subsystem for Linux) to test the project code, especially with options like MUMPS_parmetis=on.
+
+* don't forget to test with `cmake --workflow shared`
