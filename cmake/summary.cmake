@@ -1,4 +1,6 @@
 include(FeatureSummary)
+
+add_feature_info(Python MUMPS_python "Python interface for MUMPS")
 add_feature_info(Parallel MUMPS_parallel "parallel MUMPS (using MPI and Scalapack)")
 add_feature_info(64-bit-integer MUMPS_intsize64 "use 64-bit integers in C and Fortran")
 add_feature_info(GEMMT BLAS_HAVE_GEMMT "use GEMMT for symmetric matrix-matrix multiplication")

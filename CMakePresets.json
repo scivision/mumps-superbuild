@@ -60,6 +60,15 @@
   "toolset": "fortran=ifx",
   "architecture": "x64"
 },
+{ "name": "python", "inherits": "shared",
+  "displayName": "with Python *mumps.*.pyd importable module",
+  "cacheVariables": {
+    "MUMPS_python": true,
+    "MUMPS_parallel": false,
+    "MUMPS_pord": false,
+    "MUMPS_UPSTREAM_VERSION": "5.7.3"
+  }
+},
 {
   "name": "linux", "inherits": "default",
   "displayName": "Linux with Ninja (for WSL CI)",
@@ -173,6 +182,7 @@
 "buildPresets": [
   { "name": "default", "displayName": "build with Ninja", "configurePreset": "default" },
   { "name": "int64", "configurePreset": "int64", "displayName": "with 64-bit integers" },
+  { "name": "python", "configurePreset": "python", "displayName": "Python interface"},
   { "name": "openmp-mpi", "configurePreset": "openmp-mpi", "displayName": "with OpenMP and MPI" },
   { "name": "openmp-nompi", "configurePreset": "openmp-nompi", "displayName": "with OpenMP, but without MPI" },
   { "name": "gmake", "displayName": "build with GNU Make", "configurePreset": "gmake", "jobs": 4 },
@@ -219,6 +229,11 @@
   }
 },
 { "name": "int64", "configurePreset": "int64", "inherits": "default", "displayName": "with 64-bit integers" },
+{ "name": "python", "configurePreset": "python", "inherits": "default", "displayName": "Python interface",
+  "filter": {
+    "include": {"label": "python"}
+  }
+},
 { "name": "openmp-mpi", "configurePreset": "openmp-mpi", "inherits": "default" },
 { "name": "openmp-nompi", "configurePreset": "openmp-nompi", "inherits": "default" },
 { "name": "gmake", "configurePreset": "gmake", "inherits": "default" },
@@ -260,6 +275,13 @@
     "steps": [
       { "type": "configure", "name": "default" },
       { "type": "build", "name": "default" }
+    ]
+  },
+  { "name": "python", "displayName": "Build Python binary module",
+    "steps": [
+      { "type": "configure", "name": "python" },
+      { "type": "build", "name": "python" },
+      { "type": "test", "name": "python" }
     ]
   },
   { "name": "int64", "displayName": "Build and Test with 64-bit integers",

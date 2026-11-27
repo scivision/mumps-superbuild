@@ -64,6 +64,9 @@ string(REGEX REPLACE "MUMPS ([0-9]+\\.[0-9]+\\.[0-9]+)" "\\1" MUMPS_ACTUAL_VERSI
 if(MUMPS_UPSTREAM_VERSION AND NOT MUMPS_ACTUAL_VERSION VERSION_EQUAL MUMPS_UPSTREAM_VERSION)
   message(FATAL_ERROR "Failed to read MUMPS version ${MUMPS_UPSTREAM_VERSION} from ${mumps_upstream_SOURCE_DIR}/VERSION, got ${MUMPS_ACTUAL_VERSION} instead.")
 endif()
+string(REGEX REPLACE "^([0-9]+)\\..*$" "\\1" MUMPS_ACTUAL_VERSION_MAJOR "${MUMPS_ACTUAL_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\..*$" "\\1" MUMPS_ACTUAL_VERSION_MINOR "${MUMPS_ACTUAL_VERSION}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*$" "\\1" MUMPS_ACTUAL_VERSION_PATCH "${MUMPS_ACTUAL_VERSION}")
 
 # minimum MUMPS version
 if(MUMPS_ACTUAL_VERSION VERSION_LESS 5.2)
@@ -101,9 +104,8 @@ set(MUMPS_Fortran_MODULE_DIRECTORY ${MUMPS_BINARY_DIR}/include)
 # --- Checks and workarounds
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
-  if(CMAKE_GENERATOR MATCHES "Ninja")
+  if(CMAKE_GENERATOR MATCHES "Ninja" AND NOT DEFINED MUMPS_Ninja_preprocess_workaround)
     set(MUMPS_Ninja_preprocess_workaround true)
-    message(STATUS "MUMPS: using LLVM Flang with Ninja generator workaround.")
   endif()
 
   if(MUMPS_UPSTREAM_VERSION VERSION_LESS 5.9.1 AND NOT MUMPS_openmp)
@@ -116,6 +118,9 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "LLVMFlang")
     endif()
     target_include_directories(mumps_dummy_openmp INTERFACE ${MUMPS_Fortran_MODULE_DIRECTORY})
   endif()
+endif()
+if(MUMPS_Ninja_preprocess_workaround)
+  message(STATUS "MUMPS: enabled workaround for LLVM Flang with Ninja generator")
 endif()
 
 
@@ -359,10 +364,14 @@ if(MUMPS_matlab)
 endif()
 
 
+# --- optional MUMPS Python interface
+if(MUMPS_python)
+  include(cmake/python.cmake)
+endif()
+
 if(MUMPS_BUILD_TESTING)
   add_subdirectory(test)
 endif()
-
 
 # --- feature summary
 

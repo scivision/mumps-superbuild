@@ -10,8 +10,10 @@ option(MUMPS_gemmt "Use GEMMT BLAS extension for matrix-matrix multiplication (s
 
 option(MUMPS_avx512 "AVX512 VBMI instruction set accelerates adaptive precision with BLR" OFF)
 
+option(MUMPS_python "Build the mumps_superbuild Python interface")
+
 option(MUMPS_parallel "parallel (use MPI)" ON)
-option(MUMPS_scalapack "Use ScalaPACK to speed up the solution of linear systems" ON)
+option(MUMPS_scalapack "Use ScalaPACK to speed up the solution of linear systems" ${MUMPS_parallel})
 
 option(MUMPS_intsize64 "use 64-bit integers in C and Fortran")
 

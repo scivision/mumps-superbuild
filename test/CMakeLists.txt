@@ -80,6 +80,42 @@ if(MUMPS_gpu)
   add_subdirectory(${PROJECT_SOURCE_DIR}/example/gpu build_gpu_example)
 endif()
 
+if(MUMPS_python)
+  set(python_test_dirs)
+
+  list(APPEND python_test_dirs
+    "$<TARGET_FILE_DIR:_mumps_superbuild>"
+    "$<TARGET_FILE_DIR:dmumps>")
+
+  foreach(t IN ITEMS mumps_common mpiseq mpiseq_c mpiseq_fortran)
+    if(TARGET ${t})
+      list(APPEND python_test_dirs $<TARGET_FILE_DIR:${t}>)
+    endif()
+  endforeach()
+
+  foreach(prefix IN LISTS CMAKE_PREFIX_PATH)
+    list(APPEND python_test_dirs "${prefix}/bin")
+  endforeach()
+  if(WIN32 AND DEFINED ENV{CMAKE_PREFIX_PATH})
+    list(APPEND python_test_dirs "$ENV{CMAKE_PREFIX_PATH}/bin")
+  endif()
+  if(CMAKE_Fortran_COMPILER)
+    cmake_path(GET CMAKE_Fortran_COMPILER PARENT_PATH fortran_runtime_dir)
+    list(APPEND python_test_dirs "${fortran_runtime_dir}")
+  endif()
+  list(REMOVE_DUPLICATES python_test_dirs)
+
+  add_test(NAME python_solve
+    COMMAND Python::Interpreter
+      "${CMAKE_CURRENT_SOURCE_DIR}/python_solve.py"
+      --package-root "${PROJECT_BINARY_DIR}/python"
+      --dll-directory ${python_test_dirs})
+
+  set_tests_properties(python_solve PROPERTIES
+    LABELS "python"
+    PASS_REGULAR_EXPRESSION "residual: ")
+endif()
+
 get_property(test_names DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
 
 if(MUMPS_parallel AND NOT MPIEXEC_EXECUTABLE)

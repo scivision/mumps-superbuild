@@ -114,10 +114,24 @@ If `-DMUMPS_parallel=no` was set, additional helper libraries are built in place
 
 The libmpiseq.a file isn't used directly by this project, but it for compatibility with other build systems that may expect a libmpiseq file.
 
-These libraries can be linked into C, C++, Fortran, etc. programs, or even be used with appropriate interfaces from [Matlab](./Readme_matlab.md) and Python
-[PyMUMPS](https://pypi.org/project/PyMUMPS/)
-and
-[python-mumps](https://pypi.org/project/python-mumps/).
+These libraries can be linked into C, C++, Fortran, etc. programs, or used
+from [Matlab](./Readme_matlab.md). With Python 3.12 or newer, the `python`
+CMake workflow builds and tests a minimal serial, double-precision interface:
+
+```sh
+cmake --workflow python
+```
+
+The resulting package is in the build directory and exposes:
+
+```python
+from mumps_superbuild import spsolve
+
+x = spsolve(A, b)
+```
+
+The input matrix may be any SciPy sparse matrix; the right-hand side and
+returned solution are NumPy arrays.
 
 ## Offline sources for MUMPS, Scalapack, and/or other prerequisites
 
