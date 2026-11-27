@@ -117,20 +117,29 @@ if(MUMPS_python)
       PASS_REGULAR_EXPRESSION "residual: "
     )
   elseif(MPIEXEC_EXECUTABLE)
-    add_test(NAME python_mpi_solve
-      COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2
-        ${Python_EXECUTABLE}
-        "${CMAKE_CURRENT_SOURCE_DIR}/python_solve.py"
-        --mpi
-        --package-root "${PROJECT_BINARY_DIR}/python"
-        --dll-directory ${python_test_dirs})
-
-    set_tests_properties(python_mpi_solve PROPERTIES
-      LABELS "python;mpi"
-      PROCESSORS 2
-      RESOURCE_LOCK cpu_mpi
-      PASS_REGULAR_EXPRESSION "residual: "
+    execute_process(
+      COMMAND ${Python_EXECUTABLE} -c "import mpi4py"
+      RESULT_VARIABLE python_mpi4py_result
+      ERROR_QUIET
     )
+    if(python_mpi4py_result EQUAL 0)
+      add_test(NAME python_mpi_solve
+        COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2
+          ${Python_EXECUTABLE}
+          "${CMAKE_CURRENT_SOURCE_DIR}/python_solve.py"
+          --mpi
+          --package-root "${PROJECT_BINARY_DIR}/python"
+          --dll-directory ${python_test_dirs})
+
+      set_tests_properties(python_mpi_solve PROPERTIES
+        LABELS "python;mpi"
+        PROCESSORS 2
+        RESOURCE_LOCK cpu_mpi
+        PASS_REGULAR_EXPRESSION "residual: "
+      )
+    else()
+      message(STATUS "Skipping Python MPI test: mpi4py is not installed")
+    endif()
   endif()
 endif()
 

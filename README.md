@@ -151,6 +151,13 @@ Build and run the two-rank CTest example in an MPI-capable environment:
 cmake --workflow python-mpi
 ```
 
+The optional `mpi4py` demo runs against an installed MPI build:
+
+```sh
+python -m pip install ".[mpi]"
+mpiexec -n 2 python example/python_mpi.py
+```
+
 To build and install the serial interface as a Python wheel:
 
 ```sh
