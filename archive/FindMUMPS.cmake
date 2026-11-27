@@ -7,7 +7,6 @@ FindMUMPS
 
 Finds the MUMPS library.
 Note that MUMPS generally requires SCALAPACK and LAPACK as well.
-PORD is always used, in addition to the optional Scotch or METIS.
 
 COMPONENTS
   s d c z   list one or more. Default is "s d". s: real32, d: real64, c: complex32, z: complex64
@@ -205,9 +204,6 @@ else()
   DOC "PORD ordering library"
   )
 endif()
-if(NOT PORD)
-  return()
-endif()
 
 foreach(c IN LISTS MUMPS_FIND_COMPONENTS)
   if(NOT c IN_LIST mumps_ariths)
@@ -238,9 +234,14 @@ foreach(c IN LISTS MUMPS_FIND_COMPONENTS)
   list(APPEND MUMPS_LIBRARY ${MUMPS_${c}_lib})
 endforeach()
 
-set(MUMPS_LIBRARY ${MUMPS_LIBRARY} ${MUMPS_COMMON} ${PORD} PARENT_SCOPE)
+set(_mumps_libraries ${MUMPS_LIBRARY} ${MUMPS_COMMON})
+if(PORD)
+  list(APPEND _mumps_libraries ${PORD})
+endif()
 
-endfunction(mumps_libs)
+set(MUMPS_LIBRARY ${_mumps_libraries} PARENT_SCOPE)
+
+endfunction()
 
 # --- main
 

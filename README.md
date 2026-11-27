@@ -72,7 +72,10 @@ The `${MUMPS_BINARY_DIR}/lib` directory contains library binaries.
 * libdmumps.a (real64)
 * libsmumps.a (real32)
 * libmumps_common.a (common MUMPS routines)
-* libpord.a  (PORD library)
+
+The optional PORD library is built and linked if `-DMUMPS_pord=on` is specified.
+
+* libpord.a
 
 If using Intel oneAPI on
 [Windows](./Readme_Windows.md),
@@ -81,7 +84,7 @@ correspondingly:
 * dmumps.lib
 * smumps.lib
 * mumps_common.lib
-* pord.lib
+* pord.lib (optional)
 
 ### MUMPS build options
 

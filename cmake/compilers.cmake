@@ -59,7 +59,11 @@ if(MUMPS_intsize64)
   # or runtime fails
   # See MUMPS 5.7.0 User manual about error -69
 
-  list(APPEND mumps_cdefs "$<$<COMPILE_LANGUAGE:C>:INTSIZE64;PORD_INTSIZE64>")
+  list(APPEND mumps_cdefs "$<$<COMPILE_LANGUAGE:C>:INTSIZE64>")
+
+  if(MUMPS_pord)
+    list(APPEND mumps_cdefs "$<$<COMPILE_LANGUAGE:C>:PORD_INTSIZE64>")
+  endif()
   # PORD_INTSIZE64 is used in src/mumps_pord.c and PORD/include/types.h
 
   if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU|LLVMFlang")
@@ -85,5 +89,3 @@ if(MUMPS_intsize64)
     add_link_options("$<$<COMPILE_LANGUAGE:Fortran>:-qmkl-ilp64=${_mkl_ilp64}>")
   endif()
 endif()
-
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})

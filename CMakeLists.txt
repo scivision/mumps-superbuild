@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.26...4.5)
 # CMake >= 3.25 for block(), VALIDATOR on find_*()
 # CMake >= 3.24 for FetchContent FIND_PACKAGE_ARGS
 
-set(MUMPS_PROJECT_VERSION 5.9.2.0)
+set(MUMPS_PROJECT_VERSION 5.9.2.1)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "Please use out of source build:
@@ -92,6 +92,9 @@ endif()
 enable_testing()
 
 include(GNUInstallDirs)
+
+# use our Find*.cmake modules
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 set(MUMPS_Fortran_MODULE_DIRECTORY ${MUMPS_BINARY_DIR}/include)
 
@@ -257,12 +260,16 @@ endif()
 
 # --- ordering libs
 
-set(ORDERING_DEFS pord)
+set(ORDERING_DEFS "")
 
 if(MUMPS_scotch)
   include(cmake/scotch.cmake)
 
   list(APPEND ORDERING_DEFS scotch $<$<BOOL:${MUMPS_ptscotch}>:ptscotch>)
+endif()
+
+if(MUMPS_pord)
+  list(APPEND ORDERING_DEFS pord)
 endif()
 
 # --- METIS / ParMETIS ordering definitions
@@ -314,11 +321,11 @@ message(STATUS "MUMPS SCALAPACK_VENDOR: ${SCALAPACK_VENDOR}")
 
 # --- MUMPS build
 
-# --- PORD (always used)
-configure_file(cmake/pord.cmake
-${mumps_upstream_SOURCE_DIR}/PORD/lib/CMakeLists.txt
-COPYONLY)
-add_subdirectory(${mumps_upstream_SOURCE_DIR}/PORD/lib PORD/lib)
+# --- PORD
+if(MUMPS_pord)
+  configure_file(cmake/pord.cmake ${mumps_upstream_SOURCE_DIR}/PORD/lib/CMakeLists.txt COPYONLY)
+  add_subdirectory(${mumps_upstream_SOURCE_DIR}/PORD/lib PORD/lib)
+endif()
 
 # --- MUMPS itself
 configure_file(cmake/mumps.cmake
@@ -336,7 +343,7 @@ add_subdirectory(${mumps_upstream_SOURCE_DIR}/src src)
 # Link Threads::Threads directly on the MUMPS targets so the pthread
 # symbols they use are always resolved regardless of backend.
 if(Threads_FOUND)
-  foreach(tgt IN ITEMS MUMPS::COMMON MUMPS::SMUMPS MUMPS::DMUMPS MUMPS::CMUMPS MUMPS::ZMUMPS MUMPS::PORD)
+  foreach(tgt IN ITEMS mumps_common smumps dmumps cmumps zmumps pord)
     if(TARGET ${tgt})
       target_link_libraries(${tgt} INTERFACE Threads::Threads)
     endif()

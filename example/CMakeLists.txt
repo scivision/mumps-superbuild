@@ -22,6 +22,7 @@ endif()
 find_package(MUMPS CONFIG REQUIRED)
 message(STATUS "MUMPS_DIR: ${MUMPS_DIR}
 parallel: ${MUMPS_parallel}
+PORD: ${MUMPS_pord}
 Scotch: ${MUMPS_scotch}
 METIS: ${MUMPS_metis}
 ParMETIS: ${MUMPS_parmetis}

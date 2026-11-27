@@ -101,6 +101,7 @@
   "displayName": "with Scotch ordering, without MPI",
   "cacheVariables": {
     "MUMPS_scotch": true,
+    "MUMPS_pord": false,
     "FETCHCONTENT_TRY_FIND_PACKAGE_MODE": "NEVER"
   }
 },
@@ -121,7 +122,8 @@
   "binaryDir": "build-${presetName}",
   "installDir": "${fileDir}/build-${presetName}/local",
   "cacheVariables": {
-    "MUMPS_scotch": true
+    "MUMPS_scotch": true,
+    "MUMPS_pord": false
   }
 },
 {
@@ -129,7 +131,8 @@
   "binaryDir": "build-${presetName}",
   "installDir": "${fileDir}/build-${presetName}/local",
   "cacheVariables": {
-    "MUMPS_metis": true
+    "MUMPS_metis": true,
+    "MUMPS_pord": false
   }
 },
 { "name" : "scotch-metis", "inherits": "scotch",
@@ -147,7 +150,8 @@
   "binaryDir": "build-${presetName}",
   "installDir": "${fileDir}/build-${presetName}/local",
   "cacheVariables": {
-    "MUMPS_parmetis": true
+    "MUMPS_parmetis": true,
+    "MUMPS_pord": false
   }
 },
 {

@@ -85,7 +85,10 @@ endif()
 mumps_pc_flags(_pc_libs_private ${_pc_external})
 
 # Libraries from this same install that every arithmetic needs.
-set(_pc_common mumps_common pord)
+set(_pc_common mumps_common)
+if(MUMPS_pord)
+  list(APPEND _pc_common pord)
+endif()
 if(NOT MUMPS_parallel)
   list(APPEND _pc_common mpiseq_fortran mpiseq_c)
 endif()

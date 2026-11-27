@@ -1,7 +1,12 @@
 # MUMPS ordering
 
 MUMPS by default uses PORD for ordering.
-MUMPS can optionally use ordering libraries Scotch, METIS, and/or ParMETIS, which will be automatically built if needed.
+
+```sh
+cmake -DMUMPS_pord=on
+```
+
+MUMPS can optionally use ordering libraries Scotch, PTScotch, METIS, and/or ParMETIS, which will be automatically built if needed.
 
 ## Scotch
 

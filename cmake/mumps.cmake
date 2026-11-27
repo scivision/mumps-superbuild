@@ -143,7 +143,7 @@ foreach(t IN ITEMS mumps_common mumps_common_C mumps_common_Fortran)
   target_link_libraries(${t} PUBLIC
   $<$<BOOL:${MUMPS_parmetis}>:PARMETIS::PARMETIS>
   $<$<OR:$<BOOL:${MUMPS_metis}>,$<BOOL:${MUMPS_parmetis}>>:METIS::METIS>
-  pord
+  "$<$<BOOL:${MUMPS_pord}>:MUMPS::PORD>"
   $<$<AND:$<BOOL:${MUMPS_scalapack}>,$<BOOL:${MUMPS_parallel}>>:SCALAPACK::SCALAPACK>
   LAPACK::LAPACK
   "$<$<BOOL:${MUMPS_gpu}>:CUDA::cublas;CUDA::cudart>"

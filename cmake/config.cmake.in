@@ -4,6 +4,8 @@ include(CMakeFindDependencyMacro)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
+find_dependency(Threads)
+
 set(MUMPS_UPSTREAM_VERSION @MUMPS_UPSTREAM_VERSION@)
 set(MUMPS_ACTUAL_VERSION @MUMPS_ACTUAL_VERSION@)
 
@@ -46,6 +48,9 @@ else()
   target_link_libraries(MPI::MPI_Fortran INTERFACE MUMPS::mpiseq_fortran)
 endif()
 
+set(MUMPS_pord @MUMPS_pord@)
+
+set(MUMPS_ptscotch @MUMPS_ptscotch@)
 set(MUMPS_scotch @MUMPS_scotch@)
 set(MUMPS_find_scotch @MUMPS_find_scotch@)
 set(SCOTCH_COMPONENTS @SCOTCH_COMPONENTS@)

@@ -21,6 +21,8 @@ if(MUMPS_xkblas AND NOT MUMPS_gpu)
   message(FATAL_ERROR "xKBLAS requires MUMPS_gpu=on")
 endif()
 
+option(MUMPS_pord "use PORD MUMPS ordering (from SPACE library)" ON)
+
 option(MUMPS_scotch "use Scotch orderings")
 if(MUMPS_scotch AND MUMPS_parallel)
   set(_ptscotch_default ON)

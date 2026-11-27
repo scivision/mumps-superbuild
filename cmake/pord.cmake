@@ -1,6 +1,7 @@
 mumps_get_src(pord_sources pord base)
 
 add_library(pord ${pord_sources})
+add_library(MUMPS::PORD ALIAS pord)
 
 target_include_directories(pord PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>

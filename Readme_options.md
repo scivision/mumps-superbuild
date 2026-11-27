@@ -1,7 +1,11 @@
 # MUMPS options
 
-By default PORD ordering is used.
-For large matrix systems,
+By default PORD ordering is used:
+
+```sh
+cmake -DMUMPS_pord=on
+```
+
 [Scotch, METIS, parMETIS ordering](./Readme_ordering.md)
 can be used for possible performance enhancements.
 
