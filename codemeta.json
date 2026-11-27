@@ -1,21 +1,46 @@
 {
-    "@context": "https://w3id.org/codemeta/3.0",
-    "@type": "SoftwareSourceCode",
-    "license": "https://spdx.org/licenses/CECILL-C.html",
-    "codeRepository": "https://github.com/scivision/mumps-superbuild",
-    "continuousIntegration": "https://github.com/scivision/mumps-superbuild/actions",
-    "downloadUrl": "https://github.com/scivision/mumps-superbuild/releases",
-    "issueTracker": "https://github.com/scivision/mumps-superbuild/issues",
-    "name": "MUMPS",
-    "identifier": "10.1145/3242094",
-    "description": "MUltifrontal Massively Parallel sparse direct Solver",
-    "applicationCategory": "linear algebra",
-    "developmentStatus": "active",
-    "keywords": [
-        "sparse direct solver"
-    ],
-    "programmingLanguage": [
-        "Fortran",
-        "C"
-    ]
+"@context": "https://w3id.org/codemeta/4.0",
+"@type": "SoftwareSourceCode",
+"license": "https://spdx.org/licenses/MIT",
+"codeRepository": "https://github.com/scivision/mumps-superbuild",
+"continuousIntegration": "https://github.com/scivision/mumps-superbuild/actions",
+"downloadUrl": "https://github.com/scivision/mumps-superbuild/releases",
+"issueTracker": "https://github.com/scivision/mumps-superbuild/issues",
+"name": "MUMPS",
+"identifier": "https://doi.org/10.1145/3242094",
+"description": "MUltifrontal Massively Parallel sparse direct Solver",
+"referencePublication": "https://mumps-solver.org/index.php?page=doc",
+"copyrightHolder": {
+  "@type": "Organization",
+  "name": "SciVision"
+},
+"applicationCategory": "linear algebra",
+"developmentStatus": "active",
+"keywords": [
+  "sparse direct solver",
+  "CMake superbuild"
+],
+"programmingLanguage": [ "Fortran", "C" ],
+"hasPart": [
+  {
+  "@type": "SoftwareSourceCode",
+  "name": "MUMPS",
+  "license": "https://spdx.org/licenses/CECILL-C",
+  "url": "https://mumps-solver.org/",
+  "description": "Multifrontal massively parallel sparse direct solver. Downloaded as unmodified source tarfile.",
+  "copyrightHolder": {
+    "@type": "Organization",
+    "name": "MUMPS Technologies"
+  }
+  }
+],
+"relatedSoftware": [
+    "https://gitlab.inria.fr/scotch/scotch",
+    "https://github.com/KarypisLab/ParMETIS",
+    "https://github.com/KarypisLab/METIS",
+    "https://www.netlib.org/scalapack/",
+    "https://github.com/lepus2589/accelerate-lapack",
+    "https://github.com/lexxmark/winflexbison",
+    "https://gitlab.inria.fr/xkblas/dev"
+]
 }
