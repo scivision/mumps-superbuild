@@ -47,6 +47,7 @@ def solve_double(
     uintptr_t column_address,
     uintptr_t values_address,
     uintptr_t rhs_address,
+    MUMPS_INT comm_fortran=0,
     bint verbose=False,
 ):
     cdef DMUMPS_STRUC_C instance
@@ -55,7 +56,7 @@ def solve_double(
 
     instance.par = 1
     instance.sym = 0
-    instance.comm_fortran = 0
+    instance.comm_fortran = comm_fortran
 
     try:
         instance.job = -1

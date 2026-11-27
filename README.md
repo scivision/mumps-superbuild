@@ -115,8 +115,10 @@ If `-DMUMPS_parallel=no` was set, additional helper libraries are built in place
 The libmpiseq.a file isn't used directly by this project, but it for compatibility with other build systems that may expect a libmpiseq file.
 
 These libraries can be linked into C, C++, Fortran, etc. programs, or used
-from [Matlab](./Readme_matlab.md). With Python 3.12 or newer, the `python`
-CMake workflow builds and tests a minimal serial, double-precision interface:
+from [Matlab](./Readme_matlab.md).
+
+With Python 3.12 or newer, the `python`
+CMake workflow builds and tests a minimal Python interface:
 
 ```sh
 cmake --workflow python
@@ -131,7 +133,33 @@ x = spsolve(A, b)
 ```
 
 The input matrix may be any SciPy sparse matrix; the right-hand side and
-returned solution are NumPy arrays.
+returned solution are NumPy arrays. With a parallel build and `mpi4py`, all
+ranks supply the communicator while rank 0 supplies the centralized matrix and
+right-hand side:
+
+```python
+from mpi4py import MPI
+
+x = spsolve(A if MPI.COMM_WORLD.rank == 0 else None,
+            b if MPI.COMM_WORLD.rank == 0 else None,
+            comm=MPI.COMM_WORLD)
+```
+
+Build and run the two-rank CTest example in an MPI-capable environment:
+
+```sh
+cmake --workflow python-mpi
+```
+
+To build and install the serial interface as a Python wheel:
+
+```sh
+python -m build --wheel
+python -m pip install dist/mumps_superbuild-*.whl
+```
+
+The wheel build uses this repository's CMake project through
+`scikit-build-core`; it does not use a second native build system.
 
 ## Offline sources for MUMPS, Scalapack, and/or other prerequisites
 

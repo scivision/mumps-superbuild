@@ -105,15 +105,33 @@ if(MUMPS_python)
   endif()
   list(REMOVE_DUPLICATES python_test_dirs)
 
-  add_test(NAME python_solve
-    COMMAND Python::Interpreter
-      "${CMAKE_CURRENT_SOURCE_DIR}/python_solve.py"
-      --package-root "${PROJECT_BINARY_DIR}/python"
-      --dll-directory ${python_test_dirs})
+  if(NOT MUMPS_parallel)
+    add_test(NAME python_solve
+      COMMAND Python::Interpreter
+        "${CMAKE_CURRENT_SOURCE_DIR}/python_solve.py"
+        --package-root "${PROJECT_BINARY_DIR}/python"
+        --dll-directory ${python_test_dirs})
 
-  set_tests_properties(python_solve PROPERTIES
-    LABELS "python"
-    PASS_REGULAR_EXPRESSION "residual: ")
+    set_tests_properties(python_solve PROPERTIES
+      LABELS "python"
+      PASS_REGULAR_EXPRESSION "residual: "
+    )
+  elseif(MPIEXEC_EXECUTABLE)
+    add_test(NAME python_mpi_solve
+      COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2
+        ${Python_EXECUTABLE}
+        "${CMAKE_CURRENT_SOURCE_DIR}/python_solve.py"
+        --mpi
+        --package-root "${PROJECT_BINARY_DIR}/python"
+        --dll-directory ${python_test_dirs})
+
+    set_tests_properties(python_mpi_solve PROPERTIES
+      LABELS "python;mpi"
+      PROCESSORS 2
+      RESOURCE_LOCK cpu_mpi
+      PASS_REGULAR_EXPRESSION "residual: "
+    )
+  endif()
 endif()
 
 get_property(test_names DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)

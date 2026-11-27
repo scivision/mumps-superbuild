@@ -1,0 +1,36 @@
+[build-system]
+requires = [
+  "scikit-build-core>=0.10",
+  "cython>=3",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "mumps-superbuild"
+version = "0.1.0"
+description = "Minimal Python interface to MUMPS"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+  "numpy>=1.26",
+]
+
+[tool.scikit-build]
+cmake.version = ">=3.26"
+build-dir = "build-wheel"
+wheel.packages = []
+install.components = ["python"]
+
+[tool.scikit-build.cmake.define]
+BUILD_SHARED_LIBS = true
+MUMPS_BUILD_TESTING = false
+MUMPS_BUILD_SINGLE = false
+MUMPS_BUILD_DOUBLE = true
+MUMPS_BUILD_COMPLEX = false
+MUMPS_BUILD_COMPLEX16 = false
+MUMPS_ENABLE_RPATH = false
+MUMPS_parallel = false
+MUMPS_pord = false
+MUMPS_python = true
+MUMPS_UPSTREAM_VERSION = "5.7.3"

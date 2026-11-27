@@ -70,6 +70,15 @@
   }
 },
 {
+"name": "python-mpi", "inherits": "python",
+"displayName": "with Python interface and MPI",
+"binaryDir": "build-${presetName}",
+"installDir": "${fileDir}/build-${presetName}/local",
+"cacheVariables": {
+  "MUMPS_parallel": true
+}
+},
+{
   "name": "linux", "inherits": "default",
   "displayName": "Linux with Ninja (for WSL CI)",
   "generator": "Ninja",
@@ -183,6 +192,7 @@
   { "name": "default", "displayName": "build with Ninja", "configurePreset": "default" },
   { "name": "int64", "configurePreset": "int64", "displayName": "with 64-bit integers" },
   { "name": "python", "configurePreset": "python", "displayName": "Python interface"},
+  { "name": "python-mpi", "configurePreset": "python-mpi", "displayName": "Python interface with MPI"},
   { "name": "openmp-mpi", "configurePreset": "openmp-mpi", "displayName": "with OpenMP and MPI" },
   { "name": "openmp-nompi", "configurePreset": "openmp-nompi", "displayName": "with OpenMP, but without MPI" },
   { "name": "gmake", "displayName": "build with GNU Make", "configurePreset": "gmake", "jobs": 4 },
@@ -225,7 +235,8 @@
   "execution": {
     "noTestsAction": "error",
     "scheduleRandom": true,
-    "stopOnFailure": false
+    "stopOnFailure": false,
+    "timeout": 15
   }
 },
 { "name": "int64", "configurePreset": "int64", "inherits": "default", "displayName": "with 64-bit integers" },
@@ -234,6 +245,7 @@
     "include": {"label": "python"}
   }
 },
+{ "name": "python-mpi", "configurePreset": "python-mpi", "inherits": "python", "displayName": "Python interface with MPI" },
 { "name": "openmp-mpi", "configurePreset": "openmp-mpi", "inherits": "default" },
 { "name": "openmp-nompi", "configurePreset": "openmp-nompi", "inherits": "default" },
 { "name": "gmake", "configurePreset": "gmake", "inherits": "default" },
@@ -282,6 +294,13 @@
       { "type": "configure", "name": "python" },
       { "type": "build", "name": "python" },
       { "type": "test", "name": "python" }
+    ]
+  },
+  { "name": "python-mpi", "displayName": "Build Python binary module with MPI",
+    "steps": [
+      { "type": "configure", "name": "python-mpi" },
+      { "type": "build", "name": "python-mpi" },
+      { "type": "test", "name": "python-mpi" }
     ]
   },
   { "name": "int64", "displayName": "Build and Test with 64-bit integers",
