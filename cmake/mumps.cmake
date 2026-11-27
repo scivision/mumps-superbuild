@@ -196,7 +196,13 @@ if(MUMPS_Ninja_preprocess_workaround)
   # this workaround works because these 3 source files don't depend on each other for Fortran modules,
   # so we can skip Ninja module dependency discovery for these files as a workaround for
   # https://gitlab.kitware.com/cmake/cmake/-/issues/27702
-  set_property(SOURCE ${a}fac_asm.F ${a}fac_asm_master_m.F ${a}fac_asm_master_ELT_m.F PROPERTY Fortran_PREPROCESS false)
+  set_property(SOURCE
+      ${a}fac_asm.F
+      ${a}fac_asm_master_m.F
+      ${a}fac_asm_master_ELT_m.F
+      ${a}fac_scalings_simScaleAbs.F
+    PROPERTY Fortran_PREPROCESS false
+  )
 endif()
 
 if(MUMPS_ACTUAL_VERSION VERSION_GREATER_EQUAL 5.3)
